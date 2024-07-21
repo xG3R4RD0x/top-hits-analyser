@@ -37,7 +37,14 @@ class YouTubeAudioDownloader:
                         output_file = input_file + ".mp3"
 
                     # Verificar si el archivo ya existe
-                    if not os.path.isfile(output_file):
+                    if os.path.isfile(input_file):
+                        print(
+                            "archivo encontrado en formato original, procediendo a convertir a mp3"
+                        )
+                        self.convert_to_mp3(input_file, output_file)
+                        print(f"Audio convertido a MP3: {output_file}")
+
+                    elif not os.path.isfile(output_file):
                         print(f"Descargando audio de: {video_title}")
                         ydl.download([url])
                         self.convert_to_mp3(input_file, output_file)
@@ -50,9 +57,7 @@ class YouTubeAudioDownloader:
     def convert_to_mp3(self, input_file, output_file):
         try:
             # Usa ffmpeg-python para convertir el archivo de audio con alta calidad
-            ffmpeg.input(input_file).output(
-                output_file, format="mp3", audio_bitrate="320k", q="0"
-            ).run()
+            ffmpeg.input(input_file).output(output_file, format="mp3").run()
             os.remove(input_file)  # Elimina el archivo original si es necesario
         except Exception as e:
             print(f"Error al convertir {input_file} a MP3: {e}")
@@ -85,29 +90,29 @@ class YouTubeAudioDownloader:
 
 
 def main():
-    # tracks = YouTubeAudioDownloader.read_songs_from_file("./playlist_tracks.xlsx")
+    tracks = YouTubeAudioDownloader.read_songs_from_file("./playlist_tracks.xlsx")
 
     # downloader = YouTubeAudioDownloader(tracks)
     # downloader.download_songs()
-    tracks = [
-        {
-            "playlist_name": "Mansion Reggaeton",
-            "name": "Cuatro Babys",
-            "artist": "Maluma, Trap Capos, Noriel, Bryant Myers, Juhn",
-            "album": "Cuatro Babys",
-            "release_date": "2016-12-09",
-            "YouTube URL": "https://www.youtube.com/watch?v=OXq-JP8w5H4",
-        },
-        {
-            "playlist_name": "Reggaeton 2024",
-            "name": "Frida Calo",
-            "artist": "test",
-            "album": "test",
-            "release_date": "2020-08-21",
-            "YouTube URL": "https://www.youtube.com/watch?v=76uZChJs9XA",
-        },
-        # Agrega más canciones aquí
-    ]
+    # tracks = [
+    #     {
+    #         "playlist_name": "Mansion Reggaeton",
+    #         "name": "Cuatro Babys",
+    #         "artist": "Maluma, Trap Capos, Noriel, Bryant Myers, Juhn",
+    #         "album": "Cuatro Babys",
+    #         "release_date": "2016-12-09",
+    #         "YouTube URL": "https://www.youtube.com/watch?v=OXq-JP8w5H4",
+    #     },
+    #     {
+    #         "playlist_name": "Reggaeton 2024",
+    #         "name": "Frida Calo",
+    #         "artist": "test",
+    #         "album": "test",
+    #         "release_date": "2020-08-21",
+    #         "YouTube URL": "https://www.youtube.com/watch?v=76uZChJs9XA",
+    #     },
+    #     # Agrega más canciones aquí
+    # ]
 
     downloader = YouTubeAudioDownloader(tracks)
     downloader.download_songs()
