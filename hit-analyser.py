@@ -34,7 +34,7 @@ class SpotifyPlaylistAnalyzer:
 
     def save_to_excel(self, tracks, filename="playlist_tracks.xlsx"):
         df = pd.DataFrame(
-            tracks, columns=["Playlist", "Name", "Artist", "Album", "Release Date"]
+            tracks, columns=["playlist_name", "name", "artist", "album", "release_date"]
         )
         df.to_excel(filename, index=False)
         print("exportado al excel")
@@ -44,17 +44,22 @@ def main():
     # Diccionario con nombres de playlists y sus IDs
     playlists = {
         "Mansion Reggaeton": "37i9dQZF1DWZjqjZMudx9T",
-        # "Reggaeton 2024": "03sDEv7FN58Mb9CJOs1Tgn",
+        "Reggaeton 2024": "03sDEv7FN58Mb9CJOs1Tgn",
         # Agrega más playlists según sea necesario
     }
 
     analyzer = SpotifyPlaylistAnalyzer()
     all_tracks = []
+    unique_tracks = set()
 
     for playlist_name, playlist_id in playlists.items():
         try:
             tracks = analyzer.get_tracks_from_playlist(playlist_id, playlist_name)
-            all_tracks.extend(tracks)
+            for track in tracks:
+                track_key = (track["name"], track["artist"])
+                if track_key not in unique_tracks:
+                    unique_tracks.add(track_key)
+                    all_tracks.append(track)
         except Exception as e:
             print(f"Error al obtener las canciones para {playlist_name}: {e}")
 
