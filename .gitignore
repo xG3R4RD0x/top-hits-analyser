@@ -1,3 +1,8 @@
+#music folder and tracks list
+music/
+
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
