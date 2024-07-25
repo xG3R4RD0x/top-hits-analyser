@@ -1,6 +1,7 @@
 import os
 import spotipy
 import pandas as pd
+import json
 from spotipy.oauth2 import SpotifyClientCredentials
 from dotenv import load_dotenv
 from get_music import YouTubeAudioDownloader
@@ -8,12 +9,6 @@ from search_songs import YouTubeSearcher
 
 
 class SpotifyPlaylistAnalyzer:
-
-    playlists = {
-        "Mansion Reggaeton": "37i9dQZF1DWZjqjZMudx9T",
-        "Reggaeton 2024": "03sDEv7FN58Mb9CJOs1Tgn",
-        # Agrega más playlists según sea necesario
-    }
 
     def __init__(self):
         load_dotenv()
@@ -25,6 +20,7 @@ class SpotifyPlaylistAnalyzer:
         self.sp = spotipy.Spotify(
             client_credentials_manager=self.client_credentials_manager
         )
+        self.playlists = self.read_playlist_ids("./playlist_list.json")
 
     def get_tracks_from_playlist(self, playlist_id, playlist_name, limit=100):
         tracks = []
@@ -56,9 +52,20 @@ class SpotifyPlaylistAnalyzer:
         df.to_excel(filename, index=False)
         print("exportado al excel")
 
+    def read_playlist_ids(self, json_file_path):
+        try:
+            with open(json_file_path, "r") as file:
+                data = json.load(file)
+                playlist = {
+                    playlist["name"]: playlist["id"] for playlist in data["playlists"]
+                }
+                return playlist
+        except Exception as e:
+            print(f"Error al leer el archivo JSON: {e}")
+            return []
+
 
 def main():
-
     while True:
         action = input(
             "¿Qué quieres hacer? (1: Actualizar Lista de canciones, 2: Descargar Canciones desde la Lista, 3: Actualizar Lista y descargar canciones): "
