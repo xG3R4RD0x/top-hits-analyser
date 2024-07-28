@@ -10,6 +10,8 @@ from search_songs import YouTubeSearcher
 
 class SpotifyPlaylistAnalyzer:
 
+    excelFile_path = "./playlist_tracks.xlsx"
+
     def __init__(self):
         load_dotenv()
         self.CLIENT_ID = os.getenv("SPOTIPY_CLIENT_ID")
@@ -20,6 +22,7 @@ class SpotifyPlaylistAnalyzer:
         self.sp = spotipy.Spotify(
             client_credentials_manager=self.client_credentials_manager
         )
+
         self.playlists = self.read_playlist_ids("./playlist_list.json")
 
     def get_tracks_from_playlist(self, playlist_id, playlist_name, limit=100):
@@ -64,8 +67,41 @@ class SpotifyPlaylistAnalyzer:
             print(f"Error al leer el archivo JSON: {e}")
             return []
 
+    def filter_new_and_missing_url_tracks(
+        self, new_tracks, existing_file=excelFile_path
+    ):
+        try:
+            # Leer el archivo Excel existente
+            df_existing = pd.read_excel(existing_file)
+
+            # Convertir el DataFrame en una lista de diccionarios
+            existing_tracks = df_existing.to_dict(orient="records")
+
+            # Crear un set de identificadores únicos para los tracks existentes (nombre y artista)
+            existing_track_ids = set(
+                (track["name"], track["artist"])
+                for track in existing_tracks
+                if pd.notna(track["YouTube URL"])
+            )
+
+            # Filtrar los nuevos tracks para incluir solo aquellos que no están en el set de identificadores
+            # o aquellos que tienen el campo "YouTube URL" vacío
+            filtered_tracks = [
+                track
+                for track in new_tracks
+                if (track["name"], track["artist"]) not in existing_track_ids
+                or pd.isna(track.get("YouTube URL"))
+            ]
+
+            return filtered_tracks
+
+        except Exception as e:
+            print(f"No se pudo procesar el Excel: {e}")
+            return new_tracks
+
 
 def main():
+
     while True:
         action = input(
             "¿Qué quieres hacer? (1: Actualizar Lista de canciones, 2: Descargar Canciones desde la Lista, 3: Actualizar Lista y descargar canciones): "
@@ -89,13 +125,13 @@ def main():
                             all_tracks.append(track)
                 except Exception as e:
                     print(f"Error al obtener las canciones para {playlist_name}: {e}")
-
+            all_tracks = analyzer.filter_new_and_missing_url_tracks(all_tracks)
             all_tracks = YouTubeSearcher.add_youtube_urls_to_tracks(all_tracks)
             analyzer.save_to_excel(all_tracks)
 
         elif action == "2":
             tracks = YouTubeAudioDownloader.read_songs_from_file(
-                "./playlist_tracks.xlsx"
+                analyzer.excelFile_path
             )
             downloader = YouTubeAudioDownloader(tracks)
             downloader.download_songs()
