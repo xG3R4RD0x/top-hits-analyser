@@ -2,6 +2,7 @@ import os
 from yt_dlp import YoutubeDL
 import ffmpeg
 import pandas as pd
+import glob
 
 
 class YouTubeAudioDownloader:
@@ -12,47 +13,75 @@ class YouTubeAudioDownloader:
         # Crear el directorio si no existe
         os.makedirs(output_path, exist_ok=True)
 
-        ydl_opts = {
-            "format": "bestaudio/best",  # Descargar el mejor audio disponible
-            "outtmpl": os.path.join(output_path, "%(title)s.%(ext)s"),
-            "noplaylist": True,
-        }
+        # Verificar y crear una lista de tracks a descargar
+        tracks_to_download = self.get_tracks_to_download(output_path)
 
-        with YoutubeDL(ydl_opts) as ydl:
-            for track in self.tracks:
+        with YoutubeDL() as ydl:
+            for track in tracks_to_download:
                 url = track.get(
                     "YouTube URL"
                 )  # Obtén la URL directamente del diccionario
+                video_title = f"{track['name']} - {track['artist']}"
+                ydl_opts = {
+                    "format": "bestaudio/best",  # Descargar el mejor audio disponible
+                    "outtmpl": os.path.join(output_path, f"{video_title}.%(ext)s"),
+                    "noplaylist": True,
+                    "postprocessors": [
+                        {  # Postprocesador para convertir a mp3
+                            "key": "FFmpegExtractAudio",
+                            "preferredcodec": "mp3",
+                            "preferredquality": "192",
+                        }
+                    ],
+                }
                 try:
-                    # Obtener información del video sin descargar
-                    info = ydl.extract_info(url, download=False)
-                    video_title = info["title"]
-                    print(f"Verificando si el audio de: {video_title} ya existe")
+                    with YoutubeDL(ydl_opts) as ydl_with_opts:
+                        # Obtener información del video sin descargar
+                        info = ydl_with_opts.extract_info(url, download=False)
+                        print(f"Verificando si el audio de: {video_title} ya existe")
 
-                    # Preparar nombres de archivo
-                    input_file = ydl.prepare_filename(info)
-                    if input_file.endswith(".webm"):
-                        output_file = input_file.replace(".webm", ".mp3")
-                    else:
-                        output_file = input_file + ".mp3"
-
-                    # Verificar si el archivo ya existe
-                    if os.path.isfile(input_file):
-                        print(
-                            "archivo encontrado en formato original, procediendo a convertir a mp3"
+                        # Comprobar si ya existe un archivo con el nombre del video en cualquier formato
+                        existing_files = glob.glob(
+                            os.path.join(output_path, f"*{video_title}*")
                         )
-                        self.convert_to_mp3(input_file, output_file)
-                        print(f"Audio convertido a MP3: {output_file}")
 
-                    elif not os.path.isfile(output_file):
+                        if existing_files:
+                            print(
+                                f"Archivos existentes encontrados para {video_title}: {existing_files}"
+                            )
+                            for file in existing_files:
+                                if not file.endswith(".mp3"):
+                                    print(
+                                        f"Archivo de formato no MP3 encontrado: {file}, convirtiendo a MP3"
+                                    )
+                                    self.convert_to_mp3(
+                                        file,
+                                        file.replace(os.path.splitext(file)[1], ".mp3"),
+                                    )
+                            continue  # Pasar al siguiente track
+
+                        # Descargar el archivo si no existe en ningún formato
                         print(f"Descargando audio de: {video_title}")
-                        ydl.download([url])
-                        self.convert_to_mp3(input_file, output_file)
-                        print(f"Audio descargado y convertido a MP3: {output_file}")
-                    else:
-                        print(f"Archivo ya existe: {output_file}")
+                        ydl_with_opts.download([url])
+
                 except Exception as e:
                     print(f"Error al descargar {url}: {e}")
+
+    def get_tracks_to_download(self, output_path):
+        existing_files = glob.glob(os.path.join(output_path, "*.mp3"))
+        existing_titles = [
+            os.path.splitext(os.path.basename(f))[0] for f in existing_files
+        ]
+        tracks_to_download = []
+
+        for track in self.tracks:
+            track_title = f"{track['name']} - {track['artist']}"
+            if track_title not in existing_titles:
+                tracks_to_download.append(track)
+            else:
+                print(f"El archivo ya existe: {track_title}")
+
+        return tracks_to_download
 
     def convert_to_mp3(self, input_file, output_file):
         try:
@@ -91,28 +120,6 @@ class YouTubeAudioDownloader:
 
 def main():
     tracks = YouTubeAudioDownloader.read_songs_from_file("./playlist_tracks.xlsx")
-
-    # downloader = YouTubeAudioDownloader(tracks)
-    # downloader.download_songs()
-    # tracks = [
-    #     {
-    #         "playlist_name": "Mansion Reggaeton",
-    #         "name": "Cuatro Babys",
-    #         "artist": "Maluma, Trap Capos, Noriel, Bryant Myers, Juhn",
-    #         "album": "Cuatro Babys",
-    #         "release_date": "2016-12-09",
-    #         "YouTube URL": "https://www.youtube.com/watch?v=OXq-JP8w5H4",
-    #     },
-    #     {
-    #         "playlist_name": "Reggaeton 2024",
-    #         "name": "Frida Calo",
-    #         "artist": "test",
-    #         "album": "test",
-    #         "release_date": "2020-08-21",
-    #         "YouTube URL": "https://www.youtube.com/watch?v=76uZChJs9XA",
-    #     },
-    #     # Agrega más canciones aquí
-    # ]
 
     downloader = YouTubeAudioDownloader(tracks)
     downloader.download_songs()
