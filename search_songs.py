@@ -1,5 +1,5 @@
 from yt_dlp import YoutubeDL
-import pandas as pd
+import re
 
 
 class YouTubeSearcher:
@@ -34,11 +34,6 @@ class YouTubeSearcher:
             track["YouTube URL"] = youtube_url
 
         return tracks
-
-    def save_tracks_to_excel(tracks, filename="playlist_tracks.xlsx"):
-        df = pd.DataFrame(tracks)
-        df.to_excel(filename, index=False)
-        print(f"Archivo {filename} actualizado con URLs de YouTube.")
 
 
 # def main():

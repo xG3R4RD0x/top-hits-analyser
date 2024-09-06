@@ -1,6 +1,7 @@
 import os
 import spotipy
 import pandas as pd
+import re
 import json
 from spotipy.oauth2 import SpotifyClientCredentials
 from dotenv import load_dotenv
@@ -37,6 +38,8 @@ class SpotifyPlaylistAnalyzer:
                 "album": track["album"]["name"],
                 "release_date": track["album"]["release_date"],
             }
+            track_info["name"] = self.sanitize_songname(track_info["name"])
+            track_info["artist"] = self.sanitize_songname(track_info["artist"])
             tracks.append(track_info)
         return tracks
 
@@ -98,6 +101,16 @@ class SpotifyPlaylistAnalyzer:
         except Exception as e:
             print(f"No se pudo procesar el Excel: {e}")
             return new_tracks
+
+    def sanitize_songname(self, name: str) -> str:
+
+        illegal_chars_pattern = r'[\/:*?"<>|\\]'
+
+        sanitized_songname = re.sub(illegal_chars_pattern, " ", name)
+
+        sanitized_songname = sanitized_songname.strip().strip(".")
+
+        return sanitized_songname
 
 
 def main():

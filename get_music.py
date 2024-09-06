@@ -123,6 +123,7 @@ def main():
 
     downloader = YouTubeAudioDownloader(tracks)
     downloader.download_songs()
+    # tracks = downloader.get_tracks_to_download("music/hits")
 
 
 if __name__ == "__main__":
