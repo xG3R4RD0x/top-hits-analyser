@@ -82,25 +82,31 @@ class SpotifyPlaylistAnalyzer:
 
             # Crear un set de identificadores únicos para los tracks existentes (nombre y artista)
             existing_track_ids = set(
-                (track["name"], track["artist"])
+                (
+                    self.sanitize_songname(track["name"]),
+                    self.sanitize_songname(track["artist"]),
+                )
                 for track in existing_tracks
-                if pd.notna(track["YouTube URL"])
+                if pd.notna(
+                    track["YouTube URL"]
+                )  # Solo incluir tracks que ya tienen URL de YouTube
             )
 
-            # Filtrar los nuevos tracks para incluir solo aquellos que no están en el set de identificadores
-            # o aquellos que tienen el campo "YouTube URL" vacío
+            # Inicializar una lista para almacenar los tracks filtrados
             filtered_tracks = [
                 track
                 for track in new_tracks
-                if (track["name"], track["artist"]) not in existing_track_ids
-                or pd.isna(track.get("YouTube URL"))
+                if (
+                    self.sanitize_songname(track["name"]),
+                    self.sanitize_songname(track["artist"]),
+                )
+                not in existing_track_ids
             ]
-
             return filtered_tracks
 
         except Exception as e:
             print(f"No se pudo procesar el Excel: {e}")
-            return new_tracks
+            return new_tracks  # En caso de error, devolver todos los nuevos tracks
 
     def sanitize_songname(self, name: str) -> str:
 
@@ -166,6 +172,7 @@ def main():
                 except Exception as e:
                     print(f"Error al obtener las canciones para {playlist_name}: {e}")
 
+            all_tracks = analyzer.filter_new_and_missing_url_tracks(all_tracks)
             all_tracks = YouTubeSearcher.add_youtube_urls_to_tracks(all_tracks)
             analyzer.save_to_excel(all_tracks)
 
