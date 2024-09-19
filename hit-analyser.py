@@ -110,9 +110,11 @@ class SpotifyPlaylistAnalyzer:
 
     def sanitize_songname(self, name: str) -> str:
 
-        illegal_chars_pattern = r'[\/:*?"<>|\\]'
+        illegal_chars_pattern = r'[\/:*?"<>|\\-]'
 
         sanitized_songname = re.sub(illegal_chars_pattern, " ", name)
+
+        sanitized_songname = re.sub(" +", " ", sanitized_songname)
 
         sanitized_songname = sanitized_songname.strip().strip(".")
 
