@@ -21,7 +21,7 @@ class YouTubeAudioDownloader:
                 url = track.get(
                     "YouTube URL"
                 )  # Obtén la URL directamente del diccionario
-                video_title = f"{track['name']} - {track['artist']}"
+                video_title = f"{track['artist']} - {track['name']}"
                 ydl_opts = {
                     "format": "bestaudio/best",  # Descargar el mejor audio disponible
                     "outtmpl": os.path.join(output_path, f"{video_title}.%(ext)s"),
