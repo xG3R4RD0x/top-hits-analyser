@@ -75,7 +75,7 @@ class YouTubeAudioDownloader:
         tracks_to_download = []
 
         for track in self.tracks:
-            track_title = f"{track['name']} - {track['artist']}"
+            track_title = f"{track['artist']} - {track['name']}"
             if track_title not in existing_titles:
                 tracks_to_download.append(track)
             else:
