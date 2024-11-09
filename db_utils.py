@@ -1,8 +1,12 @@
 import sqlite3
+import os
+
+# Define la ruta a la base de datos en el directorio raíz del proyecto
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tracks.db")
 
 
-def insert_song(db_path, playlist_name, name, artist, album, release_date, youtube_url):
-    conn = sqlite3.connect(db_path)
+def insert_song(song):
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     try:
@@ -11,19 +15,55 @@ def insert_song(db_path, playlist_name, name, artist, album, release_date, youtu
             INSERT INTO tracks (playlist_name, name, artist, album, release_date, youtube_url) 
             VALUES (?, ?, ?, ?, ?, ?)
         """,
-            (playlist_name, name, artist, album, release_date, youtube_url),
+            (
+                song["playlist_name"],
+                song["name"],
+                song["artist"],
+                song["album"],
+                song["release_date"],
+                song["youtube_url"],
+            ),
         )
         conn.commit()
     except sqlite3.IntegrityError:
-        print(f"El track {artist} - {name} ya existe en la base de datos.")
+        print(
+            f"El track {song['artist']} - {song['name']} ya existe en la base de datos."
+        )
 
     conn.close()
 
 
-def update_song(
-    db_path, song_id, playlist_name, name, artist, album, release_date, youtube_url
-):
-    conn = sqlite3.connect(db_path)
+def insert_songs_bulk(songs):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    try:
+        cursor.executemany(
+            """
+            INSERT INTO tracks (playlist_name, name, artist, album, release_date, youtube_url) 
+            VALUES (?, ?, ?, ?, ?, ?)
+        """,
+            [
+                (
+                    song["playlist_name"],
+                    song["name"],
+                    song["artist"],
+                    song["album"],
+                    song["release_date"],
+                    song["youtube_url"],
+                )
+                for song in songs
+            ],
+        )
+        conn.commit()
+    except sqlite3.IntegrityError as e:
+        print(f"Error al insertar canciones: {e}")
+
+    conn.close()
+
+
+def update_song(song_id, song):
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute(
@@ -32,25 +72,23 @@ def update_song(
         SET playlist_name = ?, name = ?, artist = ?, album = ?, release_date = ?, youtube_url = ?
         WHERE id = ?
     """,
-        (playlist_name, name, artist, album, release_date, youtube_url, song_id),
+        (
+            song["playlist_name"],
+            song["name"],
+            song["artist"],
+            song["album"],
+            song["release_date"],
+            song["youtube_url"],
+            song_id,
+        ),
     )
 
     conn.commit()
     conn.close()
 
 
-def delete_song(db_path, song_id):
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-
-    cursor.execute("DELETE FROM tracks WHERE id = ?", (song_id,))
-
-    conn.commit()
-    conn.close()
-
-
-def list_songs(db_path):
-    conn = sqlite3.connect(db_path)
+def list_songs():
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM tracks")
@@ -60,8 +98,8 @@ def list_songs(db_path):
     return tracks
 
 
-def list_songs_by_playlist(db_path, playlist_name):
-    conn = sqlite3.connect(db_path)
+def list_songs_by_playlist(playlist_name):
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM tracks WHERE playlist_name = ?", (playlist_name,))
@@ -69,3 +107,13 @@ def list_songs_by_playlist(db_path, playlist_name):
 
     conn.close()
     return tracks
+
+
+def delete_song(song_id):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM tracks WHERE id = ?", (song_id,))
+
+    conn.commit()
+    conn.close()
