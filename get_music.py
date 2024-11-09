@@ -81,6 +81,8 @@ class YouTubeAudioDownloader:
             else:
                 print(f"El archivo ya existe: {track_title}")
 
+        print("existen: " + len(tracks_to_download) + "tracks nuevos")
+
         return tracks_to_download
 
     def convert_to_mp3(self, input_file, output_file):

@@ -102,6 +102,7 @@ class SpotifyPlaylistAnalyzer:
                 )
                 not in existing_track_ids
             ]
+            print("tracks nuevos sin url: ", len(filtered_tracks))
             return filtered_tracks
 
         except Exception as e:
@@ -147,6 +148,7 @@ def main():
                 except Exception as e:
                     print(f"Error al obtener las canciones para {playlist_name}: {e}")
             all_tracks = analyzer.filter_new_and_missing_url_tracks(all_tracks)
+            print("tracks totales: ", len(all_tracks))
             all_tracks = YouTubeSearcher.add_youtube_urls_to_tracks(all_tracks)
             analyzer.save_to_excel(all_tracks)
 
