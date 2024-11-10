@@ -46,12 +46,12 @@ def insert_songs_bulk(songs):
         """,
             [
                 (
-                    song["playlist_name"],
-                    song["name"],
-                    song["artist"],
-                    song["album"],
-                    song["release_date"],
-                    song["youtube_url"],
+                    song.playlist_name,
+                    song.name,
+                    song.artist,
+                    song.album,
+                    song.release_date,
+                    song.youtube_url,
                 )
                 for song in songs
             ],
@@ -59,8 +59,8 @@ def insert_songs_bulk(songs):
         conn.commit()
     except sqlite3.IntegrityError as e:
         print(f"Error al insertar canciones: {e}")
-
-    conn.close()
+    finally:
+        conn.close()
 
 
 def update_song(song_id, **kwargs):
@@ -104,6 +104,19 @@ def list_songs():
 
     conn.close()
     return tracks
+
+
+def list_songs_as_song_objects():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT playlist_name, name, artist, album, release_date, youtube_url FROM tracks"
+    )
+    tracks = cursor.fetchall()
+
+    conn.close()
+    return [Song(*track) for track in tracks]
 
 
 def list_songs_by_playlist(playlist_name):

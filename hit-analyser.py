@@ -7,7 +7,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 from dotenv import load_dotenv
 from get_music import YouTubeAudioDownloader
 from search_songs import YouTubeSearcher
-from song import Song
+from song import Song, UniqueSongList
 import db_utils as db
 
 
@@ -43,6 +43,7 @@ class SpotifyPlaylistAnalyzer:
                     album=track["album"]["name"],
                     release_date=track["album"]["release_date"],
                 )
+                print(song.name)
 
             except Exception as e:
                 print(f"Error al procesar la canción: {e}")
@@ -150,25 +151,30 @@ def main():
 
         elif action == "4":
             print("tester action")
-            playlist_id = "37i9dQZF1DWZjqjZMudx9T"
-            playlist_name = "Mansion reggaeton2"
-            all_tracks = []
-            results = analyzer.sp.playlist_tracks(playlist_id, limit=100)
-            for item in results["items"]:
+            song_list_from_db = db.list_songs_as_song_objects()
+            all_tracks = UniqueSongList(song_list_from_db)
+            original_len = len(all_tracks.songs)
+            for playlist_name, playlist_id in analyzer.playlists.items():
+
                 try:
-                    track = item["track"]
-                    song = Song(
-                        playlist_name=playlist_name,
-                        name=analyzer.sanitize_songname(track["name"]),
-                        artist=analyzer.sanitize_songname(
-                            ", ".join(artist["name"] for artist in track["artists"])
-                        ),
-                        album=track["album"]["name"],
-                        release_date=track["album"]["release_date"],
+                    tracks = analyzer.get_tracks_from_playlist(
+                        playlist_id, playlist_name
                     )
-                    print(song.name)
+                    actual_len = len(all_tracks.songs)
+                    for track in tracks:
+                        all_tracks.append(track)
+                    new_len = len(all_tracks.songs)
                 except Exception as e:
-                    print(f"Error al procesar la canción: {e}")
+                    print(f"Error al obtener las canciones para {playlist_name}: {e}")
+                print(
+                    f"Se agregaron {new_len-actual_len} canciones de la lista {playlist_name}"
+                )
+            db.insert_songs_bulk(all_tracks.songs)
+            print(
+                "se agregaron ",
+                len(all_tracks.songs) - original_len,
+                " canciones a la base de datos",
+            )
 
         elif action == "q":
             break
