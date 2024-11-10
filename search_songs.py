@@ -1,5 +1,6 @@
 from yt_dlp import YoutubeDL
 import re
+import db_utils as db
 
 
 class YouTubeSearcher:
@@ -28,10 +29,10 @@ class YouTubeSearcher:
         searcher = YouTubeSearcher()
 
         for track in tracks:
-            query = f"{track['name']} {track['artist']}"
+            query = f"{track.name} {track.artist}"
             print(f"Buscando: {query}")
             youtube_url = searcher.search_youtube(query)
-            track["YouTube URL"] = youtube_url
+            db.update_song(track.id, {"youtube_url": youtube_url})
 
         return tracks
 

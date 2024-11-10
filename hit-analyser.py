@@ -7,6 +7,8 @@ from spotipy.oauth2 import SpotifyClientCredentials
 from dotenv import load_dotenv
 from get_music import YouTubeAudioDownloader
 from search_songs import YouTubeSearcher
+from song import Song
+import db_utils as db
 
 
 class SpotifyPlaylistAnalyzer:
@@ -30,22 +32,26 @@ class SpotifyPlaylistAnalyzer:
         tracks = []
         results = self.sp.playlist_tracks(playlist_id, limit=limit)
         for item in results["items"]:
-            track = item["track"]
-            track_info = {
-                "playlist_name": playlist_name,
-                "name": track["name"],
-                "artist": ", ".join(artist["name"] for artist in track["artists"]),
-                "album": track["album"]["name"],
-                "release_date": track["album"]["release_date"],
-            }
-            track_info["name"] = self.sanitize_songname(track_info["name"])
-            track_info["artist"] = self.sanitize_songname(track_info["artist"])
-            tracks.append(track_info)
+            try:
+                track = item["track"]
+                song = Song(
+                    playlist_name=playlist_name,
+                    name=self.sanitize_songname(track["name"]),
+                    artist=self.sanitize_songname(
+                        ", ".join(artist["name"] for artist in track["artists"])
+                    ),
+                    album=track["album"]["name"],
+                    release_date=track["album"]["release_date"],
+                )
+
+            except Exception as e:
+                print(f"Error al procesar la canción: {e}")
+            tracks.append(song)
         return tracks
 
     def save_to_excel(self, tracks, filename="playlist_tracks.xlsx"):
         df = pd.DataFrame(
-            tracks,
+            [track.to_dict() for track in tracks],
             columns=[
                 "playlist_name",
                 "name",
@@ -70,45 +76,6 @@ class SpotifyPlaylistAnalyzer:
             print(f"Error al leer el archivo JSON: {e}")
             return []
 
-    def filter_new_and_missing_url_tracks(
-        self, new_tracks, existing_file=excelFile_path
-    ):
-        try:
-            # Leer el archivo Excel existente
-            df_existing = pd.read_excel(existing_file)
-
-            # Convertir el DataFrame en una lista de diccionarios
-            existing_tracks = df_existing.to_dict(orient="records")
-
-            # Crear un set de identificadores únicos para los tracks existentes (nombre y artista)
-            existing_track_ids = set(
-                (
-                    self.sanitize_songname(track["name"]),
-                    self.sanitize_songname(track["artist"]),
-                )
-                for track in existing_tracks
-                if pd.notna(
-                    track["YouTube URL"]
-                )  # Solo incluir tracks que ya tienen URL de YouTube
-            )
-
-            # Inicializar una lista para almacenar los tracks filtrados
-            filtered_tracks = [
-                track
-                for track in new_tracks
-                if (
-                    self.sanitize_songname(track["name"]),
-                    self.sanitize_songname(track["artist"]),
-                )
-                not in existing_track_ids
-            ]
-            print("tracks nuevos sin url: ", len(filtered_tracks))
-            return filtered_tracks
-
-        except Exception as e:
-            print(f"No se pudo procesar el Excel: {e}")
-            return new_tracks  # En caso de error, devolver todos los nuevos tracks
-
     def sanitize_songname(self, name: str) -> str:
 
         illegal_chars_pattern = r'[\/:*?"<>|\\-]'
@@ -126,31 +93,29 @@ def main():
 
     while True:
         action = input(
-            "¿Qué quieres hacer? (1: Actualizar Lista de canciones, 2: Descargar Canciones desde la Lista, 3: Actualizar Lista y descargar canciones): "
+            "¿Qué quieres hacer? (1: Actualizar Lista de canciones, 2: Descargar Canciones desde la Lista, 3: Actualizar Lista y descargar canciones, 4: tester de funciones): "
         )
 
         analyzer = SpotifyPlaylistAnalyzer()
         if action == "1":
-
-            all_tracks = []
-            unique_tracks = set()
 
             for playlist_name, playlist_id in analyzer.playlists.items():
                 try:
                     tracks = analyzer.get_tracks_from_playlist(
                         playlist_id, playlist_name
                     )
-                    for track in tracks:
-                        track_key = (track["name"], track["artist"])
-                        if track_key not in unique_tracks:
-                            unique_tracks.add(track_key)
-                            all_tracks.append(track)
+                    missing_tracks = db.get_missing_tracks(tracks)
+                    db.insert_songs_bulk(missing_tracks)
                 except Exception as e:
                     print(f"Error al obtener las canciones para {playlist_name}: {e}")
-            all_tracks = analyzer.filter_new_and_missing_url_tracks(all_tracks)
-            print("tracks totales: ", len(all_tracks))
-            all_tracks = YouTubeSearcher.add_youtube_urls_to_tracks(all_tracks)
-            analyzer.save_to_excel(all_tracks)
+
+            new_tracks = db.get_tracks_without_youtube_url()
+            print("nuevos tracks: ", len(new_tracks))
+            print(
+                "cantidad total de canciones en la base de datos: " + db.count_tracks()
+            )
+            all_tracks = YouTubeSearcher.add_youtube_urls_to_tracks(new_tracks)
+            print("Links a youtube agregados")
 
         elif action == "2":
             tracks = YouTubeAudioDownloader.read_songs_from_file(
@@ -169,7 +134,7 @@ def main():
                         playlist_id, playlist_name
                     )
                     for track in tracks:
-                        track_key = (track["name"], track["artist"])
+                        track_key = (track.name, track.artist)
                         if track_key not in unique_tracks:
                             unique_tracks.add(track_key)
                             all_tracks.append(track)
@@ -182,6 +147,28 @@ def main():
 
             downloader = YouTubeAudioDownloader(all_tracks)
             downloader.download_songs()
+
+        elif action == "4":
+            print("tester action")
+            playlist_id = "37i9dQZF1DWZjqjZMudx9T"
+            playlist_name = "Mansion reggaeton2"
+            all_tracks = []
+            results = analyzer.sp.playlist_tracks(playlist_id, limit=100)
+            for item in results["items"]:
+                try:
+                    track = item["track"]
+                    song = Song(
+                        playlist_name=playlist_name,
+                        name=analyzer.sanitize_songname(track["name"]),
+                        artist=analyzer.sanitize_songname(
+                            ", ".join(artist["name"] for artist in track["artists"])
+                        ),
+                        album=track["album"]["name"],
+                        release_date=track["album"]["release_date"],
+                    )
+                    print(song.name)
+                except Exception as e:
+                    print(f"Error al procesar la canción: {e}")
 
         elif action == "q":
             break
