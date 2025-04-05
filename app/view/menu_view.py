@@ -79,6 +79,7 @@ class MainMenuView(BaseView):
     def update_and_download(self):
         if hasattr(self, "commands") and "update_and_download" in self.commands:
             self.commands["update_and_download"]()
+            self.controller.show_update_db_view()
     
     def check_database(self):
         if hasattr(self, "commands") and "check_database" in self.commands:

@@ -5,6 +5,7 @@ from tkinter import ttk
 from app.view.menu_view import MainMenuView
 from app.view.database_view import DatabaseView
 from app.view.download_view import DownloadView
+from app.view.update_db_view import UpdateDBView
 
 class MainView:
     """
@@ -83,6 +84,13 @@ class MainView:
             self.add_frame(MainMenuView, "main_menu")
         
         self.show_frame("main_menu")
+        
+    def show_update_db_view(self):
+        """Muestra la vista de actualización de la base de datos"""
+        if "update_db_view" not in self.frames:
+            self.add_frame(UpdateDBView, "update_db_view")
+        
+        self.show_frame("update_db_view")
     
     def show_database_view(self):
         """Muestra la vista de la base de datos"""
