@@ -81,7 +81,7 @@ class YouTubeAudioDownloader:
             else:
                 print(f"El archivo ya existe: {track_title}")
 
-        print("existen: " + len(tracks_to_download) + "tracks nuevos")
+        print("existen: " + str(len(tracks_to_download)) + " tracks nuevos")
 
         return tracks_to_download
 
