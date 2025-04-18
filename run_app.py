@@ -1,29 +1,38 @@
-from tkinter import Tk
-from app.controller.controller import MainController
-from app.view.menu_view import MainMenuView  # Import MainMenuView
+import tkinter as tk
 import sqlite3
+import atexit
+from app.controller.controller import MainController
 
-# Global database connection
+# Configuración de la base de datos global
 DB_CONNECTION = sqlite3.connect("tracks.db", check_same_thread=False)
 
 
 def close_connection():
-    """Close the global database connection."""
+    """Cerrar la conexión a la base de datos al salir."""
     if DB_CONNECTION:
         DB_CONNECTION.close()
+        print("Conexión a la base de datos cerrada correctamente.")
+
+
+# Registrar la función para cerrar la conexión al salir
+atexit.register(close_connection)
 
 
 def main():
     """
-    Entry point for the application.
-    Initializes the main controller and starts the Tkinter main loop.
+    Punto de entrada principal para la aplicación.
+    Inicializa la interfaz gráfica y lanza el controlador principal.
     """
-    root = Tk()
+    # Crear la ventana principal
+    root = tk.Tk()
+
+    # Inicializar el controlador principal (que a su vez inicializa la vista)
     controller = MainController(root)
-    controller.view.add_frame(
-        MainMenuView, "main_menu"
-    )  # Correctly reference MainMenuView
-    controller.navigate_to("main_menu")  # Start with the main menu
+
+    # Mostrar la vista inicial (menú principal)
+    controller.navigate_to("main_menu")
+
+    # Iniciar el bucle principal de la interfaz
     root.mainloop()
 
 

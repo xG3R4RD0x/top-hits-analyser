@@ -14,9 +14,8 @@ class MainView:
     Permite cambiar dinámicamente entre diferentes vistas manteniendo la estructura principal.
     """
 
-    def __init__(self, root, controller):
+    def __init__(self, root):
         self.root = root
-        self.controller = controller
         self.root.title("Hits Downloader")
         self.root.geometry("800x600")
 
@@ -53,9 +52,6 @@ class MainView:
         # Diccionario para almacenar todas las vistas/frames
         self.frames = {}
 
-        # Inicializar con la vista inicial (menú principal)
-        self.show_main_menu()
-
     def add_frame(self, frame_class, frame_name, *args, **kwargs):
         """
         Añade un nuevo frame al gestor de vistas.
@@ -65,7 +61,7 @@ class MainView:
             frame_name: Nombre/identificador único para el frame
             *args, **kwargs: Argumentos adicionales para el constructor del frame
         """
-        frame = frame_class(self.content_container, self.controller, *args, **kwargs)
+        frame = frame_class(self.content_container, *args, **kwargs)
         self.frames[frame_name] = frame
         frame.pack_forget()  # No mostrar inmediatamente
 
@@ -78,6 +74,13 @@ class MainView:
         Args:
             frame_name: Nombre/identificador del frame a mostrar
         """
+        # Verificar si el frame existe
+        if frame_name not in self.frames:
+            print(
+                f"Error: No se puede mostrar el frame '{frame_name}' porque no existe."
+            )
+            return
+
         # Ocultar todos los frames
         for frame in self.frames.values():
             frame.pack_forget()
@@ -86,36 +89,7 @@ class MainView:
         frame = self.frames[frame_name]
         frame.pack(fill="both", expand=True)
 
-    def show_main_menu(self):
-        """Muestra el menú principal"""
-        self.controller.handle_action("show_main_menu")
-
-    def show_update_db_view(self):
-        """Muestra la vista de actualización de la base de datos"""
-        self.controller.handle_action("show_update_db_view")
-
-    def show_database_view(self):
-        """Muestra la vista de la base de datos"""
-        self.controller.handle_action("show_database_view")
-
-    def show_download_view(self):
-        """Muestra la vista de descarga"""
-        self.controller.handle_action("show_download_view")
-
-    def set_button_commands(self, commands):
-        """
-        Configura los comandos de los botones en todas las vistas.
-
-        Args:
-            commands: Diccionario con los comandos para cada acción.
-        """
-        # Guardar los comandos para poder pasarlos a nuevas vistas cuando se creen
-        self.commands = commands
-
-        # Aplicar los comandos a las vistas existentes
-        for frame in self.frames.values():
-            if hasattr(frame, "set_commands"):
-                frame.set_commands(commands)
+        return frame
 
 
 if __name__ == "__main__":

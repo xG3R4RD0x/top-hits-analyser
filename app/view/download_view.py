@@ -184,11 +184,11 @@ class DownloadView(BaseView):
 
     def go_to_main_menu(self):
         """Volver al menú principal"""
-        self.controller.handle_action("go_to_main_menu")
+        self.trigger_event("navigate_to", "main_menu")
 
     def start_download(self):
         """Iniciar la descarga de canciones"""
-        self.controller.handle_action("start_download")
+        self.trigger_event("start_download")
 
 
 # Ejecutar la vista de forma independiente cuando se ejecuta directamente

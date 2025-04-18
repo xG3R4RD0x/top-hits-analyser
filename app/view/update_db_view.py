@@ -100,7 +100,7 @@ class UpdateDBView(BaseView):
 
     def go_to_main_menu(self):
         """Volver al menú principal"""
-        self.controller.handle_action("go_to_main_menu")
+        self.trigger_event("navigate_to", "main_menu")
 
     def update_progress(self, value, text=None):
         """
@@ -177,7 +177,7 @@ class UpdateDBView(BaseView):
 
     def cancel_operation(self):
         """Cancelar la operación en curso"""
-        self.controller.handle_action("cancel_update_operation")
+        self.trigger_event("cancel_update_operation")
 
 
 # Código para depuración y prueba independiente

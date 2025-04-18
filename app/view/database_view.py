@@ -1,28 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
-import sys
-import os
 
-# Ajuste especial para importaciones cuando se ejecuta directamente
-if __name__ == "__main__":
-    # Obtener la ruta absoluta al directorio raíz del proyecto
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-
-    # Añadir el directorio raíz al path de Python
-    if project_root not in sys.path:
-        sys.path.insert(0, project_root)
-
-    # Importaciones directas para ejecución independiente
-    from app.view.base_view import BaseView
-
-    # Crear un controlador simulado para pruebas
-    class MockController:
-        def handle_action(self, action_name):
-            print(f"MockController: Acción '{action_name}' ejecutada.")
-
-else:
-    # Importaciones normales cuando se importa como módulo
-    from app.view.base_view import BaseView
+from app.view.base_view import BaseView
 
 
 class DatabaseView(BaseView):
@@ -95,82 +74,22 @@ class DatabaseView(BaseView):
         self.content_frame.grid_columnconfigure(0, weight=1)
         self.content_frame.grid_rowconfigure(0, weight=1)
 
-        # Agregar datos de muestra
-        self.add_sample_data()
-
-    def add_sample_data(self):
-        """Añadir datos de muestra para depuración"""
-        sample_data = [
-            (
-                "Reggaeton Hits",
-                "Hawái",
-                "Maluma",
-                "Papi Juancho",
-                "2020-08-21",
-                "https://youtube.com/watch?v=123",
-            ),
-            (
-                "Top Hits",
-                "Blinding Lights",
-                "The Weeknd",
-                "After Hours",
-                "2020-03-20",
-                "https://youtube.com/watch?v=456",
-            ),
-            (
-                "Mansion Reggaeton",
-                "Safaera",
-                "Bad Bunny",
-                "YHLQMDLG",
-                "2020-02-29",
-                "https://youtube.com/watch?v=789",
-            ),
-            (
-                "Fiesta Mix",
-                "Gasolina",
-                "Daddy Yankee",
-                "Barrio Fino",
-                "2004-07-13",
-                "https://youtube.com/watch?v=abc",
-            ),
-            (
-                "Reggaeton Clásicos",
-                "Rakata",
-                "Wisin & Yandel",
-                "Pa'l Mundo",
-                "2005-11-08",
-                "https://youtube.com/watch?v=def",
-            ),
-        ]
-
-        for i, (playlist, name, artist, album, date, url) in enumerate(sample_data):
-            self.tree.insert(
-                "", "end", iid=i, values=(playlist, name, artist, album, date, url)
-            )
-
     def refresh_data(self):
         """Actualizar los datos en la vista"""
-        self.controller.handle_action("refresh_database")
+        self.trigger_event("refresh_database")
 
     def go_to_main_menu(self):
         """Volver al menú principal"""
-        self.controller.handle_action("go_to_main_menu")
+        self.trigger_event("navigate_to", "main_menu")
 
+    def add_data(self, data_list):
+        """Añadir datos al tree view"""
+        # Limpiar datos actuales
+        for item in self.tree.get_children():
+            self.tree.delete(item)
 
-# Ejecutar la vista de forma independiente cuando se ejecuta directamente
-if __name__ == "__main__":
-    root = tk.Tk()
-    root.title("Base de Datos - Modo Independiente")
-    root.geometry("1000x600")
-
-    # Configurar estilo
-    style = ttk.Style()
-    style.configure("TFrame", background="#f0f0f0")
-
-    # Instanciar el controlador simulado y la vista
-    controller = MockController()
-    view = DatabaseView(root, controller)
-    view.pack(fill="both", expand=True)
-
-    # Ejecutar la aplicación
-    root.mainloop()
+        # Añadir nuevos datos
+        for i, (playlist, name, artist, album, date, url) in enumerate(data_list):
+            self.tree.insert(
+                "", "end", iid=i, values=(playlist, name, artist, album, date, url)
+            )
