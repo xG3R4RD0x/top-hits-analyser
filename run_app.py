@@ -1,5 +1,15 @@
 from tkinter import Tk
 from app.controller.controller import MainController
+import sqlite3
+
+# Global database connection
+DB_CONNECTION = sqlite3.connect("app_data.db", check_same_thread=False)
+
+
+def close_connection():
+    """Close the global database connection."""
+    if DB_CONNECTION:
+        DB_CONNECTION.close()
 
 
 def main():

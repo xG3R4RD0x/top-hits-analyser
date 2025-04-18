@@ -10,19 +10,24 @@ from search_songs import YouTubeSearcher
 from get_music import YouTubeAudioDownloader
 import db_utils
 
+
 class DatabaseModel:
     """Modelo para gestionar la base de datos de canciones y realizar operaciones de descarga."""
-    
+
     def __init__(self):
-        self.excel_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 
-                                     "playlist_tracks.xlsx")
-        
+        self.excel_path = os.path.join(
+            os.path.dirname(
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            ),
+            "playlist_tracks.xlsx",
+        )
+
     def update_database(self):
         """Actualiza la base de datos de canciones desde Spotify."""
         # Aquí implementarías la lógica para actualizar la base de datos
         # Usando las clases existentes en hit-analyser.py
         pass
-        
+
     def download_songs(self):
         """Descarga las canciones de la base de datos."""
         try:
@@ -35,7 +40,7 @@ class DatabaseModel:
         except Exception as e:
             print(f"Error al descargar canciones: {e}")
             return False
-            
+
     def check_database_status(self):
         """Comprueba el estado de la base de datos."""
         try:
@@ -47,7 +52,7 @@ class DatabaseModel:
                 return "El archivo de base de datos no existe."
         except Exception as e:
             return f"Error al verificar la base de datos: {e}"
-            
+
     def get_database_content(self):
         """Obtiene el contenido de la base de datos."""
         try:
