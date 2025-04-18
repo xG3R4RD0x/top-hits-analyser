@@ -60,7 +60,7 @@ function Install-Or-Update-Package {
 if (Install-Or-Update-Package -PackageName "pipreqs") {
     # Generar el archivo requirements.txt
     Write-Output "Generando requirements.txt con pipreqs..."
-    pipreqs .
+    pipreqs . --force
 
     # Instalar las dependencias desde requirements.txt
     Write-Output "Instalando dependencias desde requirements.txt..."
