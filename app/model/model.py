@@ -22,7 +22,7 @@ class DatabaseModel:
             "playlist_tracks.xlsx",
         )
 
-    def update_database(self):
+    def update_tracks_database(self):
         """Actualiza la base de datos de canciones desde Spotify."""
         # Aquí implementarías la lógica para actualizar la base de datos
         # Usando las clases existentes en hit-analyser.py
