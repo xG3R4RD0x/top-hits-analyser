@@ -3,47 +3,48 @@ from tkinter import ttk
 import sys
 import os
 
-# Ajuste especial para importaciones cuando se ejecuta directamente
+# Special adjustment for imports when run directly
 if __name__ == "__main__":
-    # Obtener la ruta absoluta al directorio raíz del proyecto
+    # Get the absolute path to the project root directory
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
-    # Añadir el directorio raíz al path de Python
+    # Add the root directory to Python's path
     if project_root not in sys.path:
         sys.path.insert(0, project_root)
 
-    # Importaciones directas para ejecución independiente
+    # Direct imports for independent execution
     from app.view.base_view import BaseView
+    from app.controller.update_db_controller import UpdateDBController
 
-    # Crear un controlador simulado para pruebas
-    class MockController:
-        def show_main_menu(self):
-            print("MockController: Volviendo al menú principal")
+    # Create a mock controller for testing
+    class MockMainController:
+        def navigate_to(self, view_name):
+            print(f"MockMainController: Navigating to {view_name}")
 
 else:
-    # Importaciones normales cuando se importa como módulo
+    # Normal imports when imported as a module
     from app.view.base_view import BaseView
 
 
 class UpdateDBView(BaseView):
-    """Vista para mostrar el progreso de actualización de la base de datos"""
+    """View to display database update progress"""
 
     def setup_ui(self):
-        # Título de la vista
+        # View title
         self.view_label = ttk.Label(
-            self, text="Actualización de Base de Datos", font=("Helvetica", 14)
+            self, text="Database Update", font=("Helvetica", 14)
         )
         self.view_label.pack(pady=10)
 
-        # Contenedor principal
+        # Main container
         self.main_frame = ttk.Frame(self)
         self.main_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-        # Frame para la barra de progreso
+        # Progress bar frame
         self.progress_frame = ttk.Frame(self.main_frame)
         self.progress_frame.pack(fill="x", pady=10)
 
-        self.progress_label = ttk.Label(self.progress_frame, text="Progreso:")
+        self.progress_label = ttk.Label(self.progress_frame, text="Progress:")
         self.progress_label.pack(side="left", padx=5)
 
         self.progress_bar = ttk.Progressbar(
@@ -54,14 +55,14 @@ class UpdateDBView(BaseView):
         self.progress_percentage = ttk.Label(self.progress_frame, text="0%")
         self.progress_percentage.pack(side="left", padx=5)
 
-        # Frame para el log
+        # Log frame
         self.log_frame = ttk.Frame(self.main_frame)
         self.log_frame.pack(fill="both", expand=True, pady=10)
 
-        self.log_label = ttk.Label(self.log_frame, text="Log de Operaciones:")
+        self.log_label = ttk.Label(self.log_frame, text="Operations Log:")
         self.log_label.pack(anchor="w")
 
-        # Crear un widget Text con scrollbar para el log
+        # Create a Text widget with scrollbar for the log
         self.log_text_frame = ttk.Frame(self.log_frame)
         self.log_text_frame.pack(fill="both", expand=True)
 
@@ -76,40 +77,48 @@ class UpdateDBView(BaseView):
         self.log_text.config(yscrollcommand=self.log_scrollbar.set)
         self.log_text.configure(
             state="disabled"
-        )  # Inicialmente deshabilitado para evitar edición
+        )  # Initially disabled to prevent editing
 
-        # Botones de acción
+        # Action buttons
         self.buttons_frame = ttk.Frame(self)
         self.buttons_frame.pack(fill="x", pady=10)
 
         self.back_button = ttk.Button(
             self.buttons_frame,
-            text="Volver al Menú Principal",
+            text="Back to Main Menu",
             command=self.go_to_main_menu,
         )
         self.back_button.pack(side="left", padx=10)
 
+        self.start_update_button = ttk.Button(
+            self.buttons_frame,
+            text="Start Update",
+            command=self.start_operation,
+        )
+        self.start_update_button.pack(side="left", padx=10)
+
         self.cancel_button = ttk.Button(
-            self.buttons_frame, text="Cancelar Operación", command=self.cancel_operation
+            self.buttons_frame, text="Cancel Operation", command=self.cancel_operation
         )
         self.cancel_button.pack(side="right", padx=10)
 
-        # Estado inicial
+        # Initial state
         self.is_operation_running = False
         self.cancelled = False
 
     def go_to_main_menu(self):
-        """Volver al menú principal"""
+        """Go back to main menu"""
         self.trigger_event("navigate_to", "main_menu")
 
     def update_progress(self, value, text=None):
         """
-        Actualiza la barra de progreso y opcionalmente el texto de porcentaje
+        Update progress bar and optionally the percentage text
 
         Args:
-            value: Valor de progreso (0-100)
-            text: Texto opcional para mostrar (si es None, se muestra el porcentaje)
+            value: Progress value (0-100)
+            text: Optional text to display (if None, percentage is shown)
         """
+        print(f"Updating progress: {value}%")
         self.progress_bar["value"] = value
 
         if text is None:
@@ -117,135 +126,93 @@ class UpdateDBView(BaseView):
         else:
             self.progress_percentage["text"] = text
 
-        # Forzar actualización de la UI
+        # Force UI update
         self.update_idletasks()
 
     def add_log_message(self, message):
         """
-        Añade un mensaje al área de log
+        Add a message to the log area
 
         Args:
-            message: Mensaje a añadir
+            message: Message to add
         """
-        # Habilitar el widget Text para edición
+        # Enable the Text widget for editing
         self.log_text.configure(state="normal")
 
-        # Añadir mensaje con salto de línea
+        # Add message with line break
         self.log_text.insert(tk.END, f"{message}\n")
 
-        # Desplazar automáticamente al final del texto
+        # Automatically scroll to the end of the text
         self.log_text.see(tk.END)
 
-        # Deshabilitar de nuevo para evitar edición manual
+        # Disable again to prevent manual editing
         self.log_text.configure(state="disabled")
 
-        # Forzar actualización de la UI
+        # Force UI update
         self.update_idletasks()
 
     def start_operation(self):
-        """Iniciar la operación de actualización"""
+        """Start the update operation"""
         self.is_operation_running = True
         self.cancelled = False
         self.cancel_button["state"] = "normal"
         self.back_button["state"] = "disabled"
 
-        # Limpiar el log
+        # Clear the log
         self.log_text.configure(state="normal")
         self.log_text.delete(1.0, tk.END)
         self.log_text.configure(state="disabled")
 
-        # Reiniciar la barra de progreso
+        # Reset the progress bar
         self.update_progress(0)
 
-        # Añadir un mensaje inicial
-        self.add_log_message("Iniciando actualización de la base de datos...")
+        # Add an initial message
+        self.add_log_message("Starting database update...")
+        self.controller.start_update_process()
 
     def complete_operation(self, success=True):
-        """Finalizar la operación"""
+        """Finish the operation"""
         self.is_operation_running = False
         self.cancel_button["state"] = "disabled"
         self.back_button["state"] = "normal"
 
         if success:
-            self.update_progress(100, "Completado")
-            self.add_log_message("Operación completada con éxito.")
+            self.update_progress(100, "Completed")
+            self.add_log_message("Operation completed successfully.")
         else:
             if self.cancelled:
-                self.add_log_message("Operación cancelada por el usuario.")
+                self.add_log_message("Operation cancelled by user.")
             else:
-                self.add_log_message("La operación falló. Revise los detalles arriba.")
+                self.add_log_message("Operation failed. Check details above.")
 
     def cancel_operation(self):
-        """Cancelar la operación en curso"""
+        """Cancel the ongoing operation"""
         self.trigger_event("cancel_update_operation")
 
 
-# Código para depuración y prueba independiente
+# Code for debugging and independent testing
 if __name__ == "__main__":
     import time
-    import threading
 
     root = tk.Tk()
-    root.title("Actualización de Base de Datos - Modo Independiente")
+    root.title("Database Update - Independent Mode")
     root.geometry("700x500")
 
-    # Configurar estilo
+    # Configure style
     style = ttk.Style()
     style.configure("TFrame", background="#f0f0f0")
 
-    # Instanciar el controlador simulado y la vista
-    controller = MockController()
+    # Instantiate the mock controller and view
+    main_controller = MockMainController()
+    controller = UpdateDBController(main_controller)
     view = UpdateDBView(root, controller)
     view.pack(fill="both", expand=True)
 
-    # Función para simular un proceso de actualización
-    def simulate_update_process():
-        view.start_operation()
-
-        steps = [
-            "Conectando con Spotify API...",
-            "Recuperando listas de reproducción...",
-            "Descargando información de canciones...",
-            "Buscando URLs de YouTube...",
-            "Actualizando base de datos...",
-            "Guardando resultados...",
-        ]
-
-        progress_per_step = 100 / len(steps)
-        current_progress = 0
-
-        for step in steps:
-            if view.cancelled:
-                break
-
-            view.add_log_message(step)
-            current_progress += progress_per_step / 2
-            view.update_progress(current_progress)
-
-            # Simular tiempo de procesamiento
-            time.sleep(1)
-
-            # Simular progreso dentro del paso
-            for i in range(10):
-                if view.cancelled:
-                    break
-                time.sleep(0.1)
-                current_progress += progress_per_step / 20
-                view.update_progress(current_progress)
-
-            view.add_log_message(f"✓ {step} completado")
-
-        # Finalizar la operación
-        if not view.cancelled:
-            view.complete_operation(True)
-
-    # Botón para iniciar la simulación
+    # Start button for simulation
     start_button = ttk.Button(
         root,
-        text="Iniciar Simulación",
-        command=lambda: threading.Thread(
-            target=simulate_update_process, daemon=True
-        ).start(),
+        text="Start Simulation",
+        command=controller.start_update_process,
     )
     start_button.pack(pady=10)
 

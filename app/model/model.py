@@ -10,6 +10,8 @@ from search_songs import YouTubeSearcher
 from get_music import YouTubeAudioDownloader
 import db_utils
 
+from app.model.playlists import Playlists
+
 
 class DatabaseModel:
     """Modelo para gestionar la base de datos de canciones y realizar operaciones de descarga."""
@@ -21,6 +23,11 @@ class DatabaseModel:
             ),
             "playlist_tracks.xlsx",
         )
+
+    def show_playlists(self):
+        """Actualiza las playlists de spotify."""
+        playlists_list = Playlists.list_playlists()
+        return playlists_list
 
     def update_tracks_database(self):
         """Actualiza la base de datos de canciones desde Spotify."""

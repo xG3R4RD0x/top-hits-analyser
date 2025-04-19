@@ -1,11 +1,16 @@
-from run_app import DB_CONNECTION
+from app.model.db_config import get_db_connection
 from .song import Song
 
 
 class Tracks:
+    def __init__(self):
+        """Initialize the Tracks class and ensure the table exists."""
+        self._create_table()
+
     @staticmethod
     def _create_table():
         """Create the songs table if it doesn't exist."""
+        DB_CONNECTION = get_db_connection()
         cursor = DB_CONNECTION.cursor()
         cursor.execute(
             """
@@ -25,6 +30,7 @@ class Tracks:
     @staticmethod
     def add_song(song: Song):
         """Add a new song to the database."""
+        DB_CONNECTION = get_db_connection()
         cursor = DB_CONNECTION.cursor()
         cursor.execute(
             """
@@ -45,6 +51,7 @@ class Tracks:
     @staticmethod
     def get_song(song_id) -> Song:
         """Retrieve a song by its ID."""
+        DB_CONNECTION = get_db_connection()
         cursor = DB_CONNECTION.cursor()
         cursor.execute("SELECT * FROM songs WHERE id = ?", (song_id,))
         row = cursor.fetchone()
@@ -63,6 +70,7 @@ class Tracks:
     @staticmethod
     def delete_song(song_id):
         """Delete a song by its ID."""
+        DB_CONNECTION = get_db_connection()
         cursor = DB_CONNECTION.cursor()
         cursor.execute("DELETE FROM songs WHERE id = ?", (song_id,))
         DB_CONNECTION.commit()
@@ -70,6 +78,7 @@ class Tracks:
     @staticmethod
     def update_song(song: Song):
         """Update a song's details."""
+        DB_CONNECTION = get_db_connection()
         cursor = DB_CONNECTION.cursor()
         cursor.execute(
             """
@@ -92,6 +101,7 @@ class Tracks:
     @staticmethod
     def list_songs():
         """Retrieve all songs."""
+        DB_CONNECTION = get_db_connection()
         cursor = DB_CONNECTION.cursor()
         cursor.execute("SELECT * FROM songs")
         return cursor.fetchall()
