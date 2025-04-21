@@ -23,8 +23,8 @@ class MenuController(BaseController):
         print("MenuController: Database updated and songs downloaded.")
         self.navigate_to("update_db_view")
         update_view = self.main_controller.view.frames["update_db_view"]
-        update_controller = update_view.controller
-        update_controller.start_update_process()
+        # update_controller = update_view.controller
+        # update_controller.start_update_process()
 
     def check_database(self):
         """Check the database status."""

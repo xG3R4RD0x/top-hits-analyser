@@ -16,12 +16,11 @@ class Playlists:
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS playlists (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                playlist_id TEXT NOT NULL UNIQUE,
-                name TEXT NOT NULL,
-                genre TEXT
+            playlist_id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            genre TEXT
             )
-        """
+            """
         )
         DB_CONNECTION.commit()
 

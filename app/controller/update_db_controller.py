@@ -1,6 +1,8 @@
 from app.controller.base_controller import BaseController
 import time
-from app.model.model import DatabaseModel as db
+from app.model.playlists import Playlists
+from app.model.songs import Songs
+from app.model.song import Song
 
 
 class UpdateDBController(BaseController):
@@ -26,16 +28,40 @@ class UpdateDBController(BaseController):
         self.stop_update = False
 
         self.view.add_log_message("Starting database update process...")
+       
+        playlists = self.fetch_playlists()
+        if not playlists:
+            self.view.add_log_message("No playlists available for update.")
+            return
+
+        self.view.add_log_message("Updating songs from playlists...")
+        for playlist in playlists:
+            self.view.add_log_message(f"Fetching songs from playlist: {playlist[0]}")
+            playlist_songs_list = self.fetch_songs_from_playlist( playlist[1])
+            if not playlist_songs_list:
+                self.view.add_log_message(f"No songs found in playlist: {playlist[0]}")
+                continue
+
+            self.view.add_log_message(f"Adding songs to database...")
+            for song in playlist_songs_list:
+                self.view.add_log_message(f"{song.artist} - {song.name} (ID: {song.id})")
+                Songs.add_song(song)
+              
+            self.view.add_log_message(f"Songs from playlist {playlist[0]} successfully added.")
+        
+        self.view.add_log_message("Database update process completed.")
+
+    def fetch_playlists(self):
         self.view.add_log_message("Retrieving playlists from database...")
 
-        playlists = db.show_playlists(self)
-
+        playlists = Playlists.list_playlists()
         if not playlists:
             self.view.add_log_message("No playlists found in the database.")
+            return ()
         else:
             self.view.add_log_message(f"Found {len(playlists)} playlists:")
-
-            # Display each playlist in the log messages
+            playlist_list = []
+            # Display each playlist in the log messages and collect tuples
             for playlist in playlists:
                 playlist_info = (
                     f"Playlist: {playlist.name} (ID: {playlist.playlist_id})"
@@ -43,11 +69,26 @@ class UpdateDBController(BaseController):
                 if playlist.genre:
                     playlist_info += f", Genre: {playlist.genre}"
                 self.view.add_log_message(playlist_info)
-
-        self.view.add_log_message("Playlist information loaded successfully.")
-
-        # self.view.start_operation()
-        # self._update_process()
+                playlist_list.append((playlist.name, playlist.playlist_id, playlist.genre))
+            self.view.add_log_message("Playlist information loaded successfully.")
+            return playlist_list
+            
+    def fetch_songs_from_playlist(self, playlist_id):
+        """Fetch songs from a specific playlist and return them as a list of Song objects."""
+        
+        
+        # TODO: Esto solo extrae las cosas de la base de datos
+        # lo que se necesita es que saque las canciones de la api de spotify y las meta en la base de datos
+        # en el handler de la API de spotify se tienen que extraer las canciones por plazylist_id y luego
+        # ver si ya existen en la base de datos, si no existen se añaden a la base de datos
+    
+        songs = Songs.list_songs_from_playlist(playlist_id)
+        if not songs:
+            self.view.add_log_message("No songs found in the playlist")
+            return []
+        else:
+            self.view.add_log_message(f"Found {len(songs)} songs:")
+            return songs
 
     def _update_process(self):
         """Simulated update process for demonstration"""

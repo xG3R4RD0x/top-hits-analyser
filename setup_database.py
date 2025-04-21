@@ -1,5 +1,5 @@
 from app.model.db_config import initialize_db
-from app.model.tracks import Tracks
+from app.model.songs import Songs
 from app.model.playlists import Playlists
 
 
@@ -11,7 +11,7 @@ def setup_database():
     initialize_db("tracks.db")
 
     # Create the tables explicitly
-    Tracks._create_table()
+    Songs._create_table()
     Playlists._create_table()
 
     # Update playlists from JSON after table creation
