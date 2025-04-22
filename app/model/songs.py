@@ -1,5 +1,5 @@
 from app.model.db_config import get_db_connection
-from .song import Song
+from app.model.song import Song
 
 
 class Songs:

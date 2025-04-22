@@ -2,6 +2,8 @@ import os
 import re
 import json
 import spotipy
+from app.model.song import Song
+from app.model.playlist import Playlist
 from spotipy.oauth2 import SpotifyClientCredentials
 from dotenv import load_dotenv
 
@@ -27,22 +29,25 @@ class SpotifyAPIHandler:
             )
             self._initialized = True
 
+ 
     def get_tracks_from_playlist(self, playlist_id, playlist_name, limit=100):
+        """Fetch tracks from a playlist and return them as Song objects."""
         tracks = []
         results = self.sp.playlist_tracks(playlist_id, limit=limit)
         for item in results["items"]:
             track = item["track"]
-            track_info = {
-                "playlist_name": playlist_name,
-                "name": track["name"],
-                "artist": ", ".join(artist["name"] for artist in track["artists"]),
-                "album": track["album"]["name"],
-                "release_date": track["album"]["release_date"],
-            }
-            track_info["name"] = self.sanitize_songname(track_info["name"])
-            track_info["artist"] = self.sanitize_songname(track_info["artist"])
+            track_info = Song(
+                id=track["id"],
+                playlist_name=playlist_name,
+                playlist_id=playlist_id,
+                name=self.sanitize_songname(track["name"]),
+                artist=self.sanitize_songname(", ".join(artist["name"] for artist in track["artists"])),
+                album=track["album"]["name"],
+                release_date=track["album"]["release_date"],
+            )
             tracks.append(track_info)
         return tracks
+    
 
     def read_playlist_ids(self, json_file_path):
         try:

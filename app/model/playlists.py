@@ -1,5 +1,5 @@
 from app.model.db_config import get_db_connection
-from .playlist import Playlist
+from app.model.playlist import Playlist
 import json
 
 
