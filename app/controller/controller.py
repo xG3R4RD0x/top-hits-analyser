@@ -4,7 +4,6 @@ from app.view.menu_view import MainMenuView
 from app.view.database_view import DatabaseView
 from app.view.download_view import DownloadView
 from app.view.update_db_view import UpdateDBView
-
 # Import specific controllers
 from app.controller.menu_controller import MenuController
 from app.controller.database_controller import DatabaseController
@@ -16,6 +15,7 @@ class MainController:
     def __init__(self, root):
         # Initialize main view
         self.view = MainView(root)
+       
 
         # Create all frames/views needed for the application
         self.init_frames()

@@ -1,3 +1,5 @@
+from app.api.spotipy import SpotifyAPIHandler as sp
+
 class BaseController:
     """Base controller that defines the common interface for all controllers"""
 
@@ -10,6 +12,7 @@ class BaseController:
         """
         self.main_controller = main_controller
         self.view = None
+        self.sp = sp()
 
     def set_view(self, view):
         """

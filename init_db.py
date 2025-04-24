@@ -7,7 +7,7 @@ def create_database(db_path):
 
     cursor.execute(
         """
-        CREATE TABLE IF NOT EXISTS tracks (
+        CREATE TABLE IF NOT EXISTS songs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             playlist_name TEXT NOT NULL,
             name TEXT NOT NULL,
