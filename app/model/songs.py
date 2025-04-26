@@ -28,15 +28,13 @@ class Songs:
             """
         )
         DB_CONNECTION.commit()
-        
+
     @staticmethod
     def list_songs_from_playlist(playlist_id):
         """Retrieve all songs from a specific playlist as Song objects."""
         DB_CONNECTION = get_db_connection()
         cursor = DB_CONNECTION.cursor()
-        cursor.execute(
-            "SELECT * FROM songs WHERE playlist_id = ?", (playlist_id,)
-        )
+        cursor.execute("SELECT * FROM songs WHERE playlist_id = ?", (playlist_id,))
         rows = cursor.fetchall()
         return [
             Song(
@@ -57,7 +55,7 @@ class Songs:
         """Add a new song to the database if it doesn't already exist."""
         DB_CONNECTION = get_db_connection()
         cursor = DB_CONNECTION.cursor()
-        
+
         # Check if the song already exists
         cursor.execute(
             """
@@ -69,7 +67,7 @@ class Songs:
         if cursor.fetchone()[0] > 0:
             # Song already exists, do not add it again
             return
-        
+
         # Add the song if it doesn't exist
         cursor.execute(
             """
@@ -147,3 +145,24 @@ class Songs:
         cursor = DB_CONNECTION.cursor()
         cursor.execute("SELECT * FROM songs")
         return cursor.fetchall()
+
+    @staticmethod
+    def check_field_value(song_id, field_name, value=None):
+        """Check if a specific field exists for a song in the database and optionally matches the given value."""
+        DB_CONNECTION = get_db_connection()
+        cursor = DB_CONNECTION.cursor()
+
+        # Check if the field exists in the table schema
+        cursor.execute("PRAGMA table_info(songs)")
+        columns = [column[1] for column in cursor.fetchall()]
+        if field_name not in columns:
+            return False
+
+        # Check if the field has the given value for the specified song_id
+        cursor.execute(f"SELECT {field_name} FROM songs WHERE id = ?", (song_id,))
+        result = cursor.fetchone()
+        if result is None:
+            return False
+
+        # If value is provided, check if it matches the field value
+        return result[0] == value if value is not None else True
