@@ -2,6 +2,8 @@ from app.controller.base_controller import BaseController
 from app.model.playlists import Playlists
 from app.model.songs import Songs
 from app.model.downloader import Downloader
+import threading
+from concurrent.futures import ThreadPoolExecutor
 
 
 class UpdateDBController(BaseController):
@@ -95,40 +97,67 @@ class UpdateDBController(BaseController):
             return songs
 
     def fetch_songs_urls(self):
-        """Fetch new songs URLS and add them to the database."""
-        self.view.add_log_message("Fetching songs URLs from the database...")
-        songs = Songs.list_songs()
-        total_songs = len(songs)
-        update_porcentage_step = 100 / total_songs
-        update_porcentage = 0
-        self.view.add_log_message(f"Found {total_songs} songs in the database.")
-        if not songs:
-            self.view.add_log_message("No songs found in the database.")
-            self.stop_update = True
-            self.view.complete_operation(False)
-            return
+        """Fetch new songs URLs and add them to the database."""
 
-        for song in songs:
+        def process_song(song, lock):
+            """Process a single song: fetch its URL and update the database."""
+            if self.stop_update:
+                return
+
             self.view.add_log_message(f"Fetching URL for song: {song.name}")
             video_url = Downloader.get_video_url(song)
             if video_url:
-                if song.youtube_url == video_url:
-                    self.view.add_log_message(
-                        f"URL already exists for song: {song.name}"
-                    )
-                    update_porcentage += update_porcentage_step
-                    self.view.update_progress(update_porcentage)
-                    continue
-                song.youtube_url = video_url
-                Songs.update_song(song.id, {"youtube_url": video_url})
-                self.view.add_log_message(f"Updated URL for song: {song.name}")
+                with lock:  # Synchronize database updates
+                    if song.youtube_url == video_url:
+                        self.view.add_log_message(
+                            f"URL already exists for song: {song.name}"
+                        )
+                    else:
+                        song.youtube_url = video_url
+                        Songs.update_song(song.id, {"youtube_url": video_url})
+                        self.view.add_log_message(f"Updated URL for song: {song.name}")
             else:
                 self.view.add_log_message(f"No URL found for song: {song.name}")
-            update_porcentage += update_porcentage_step
-            self.view.update_progress(update_porcentage)
 
-        self.view.complete_operation(True)
-        self.view.add_log_message("Song URLs fetched successfully.")
+        def background_task():
+            self.view.add_log_message("Fetching songs URLs from the database...")
+            songs = Songs.list_songs()
+            total_songs = len(songs)
+            if total_songs == 0:
+                self.view.add_log_message("No songs found in the database.")
+                self.stop_update = True
+                self.view.complete_operation(False)
+                return
+
+            update_porcentage_step = 100 / total_songs
+            update_porcentage = 0
+            self.view.add_log_message(f"Found {total_songs} songs in the database.")
+
+            # Lock for synchronizing shared resources
+            lock = threading.Lock()
+
+            # Use ThreadPoolExecutor for multithreading
+            with ThreadPoolExecutor(
+                max_workers=5
+            ) as executor:  # Adjust max_workers as needed
+                futures = []
+                for song in songs:
+                    futures.append(executor.submit(process_song, song, lock))
+
+                # Wait for all threads to complete
+                for future in futures:
+                    future.result()  # Raise exceptions if any occurred in threads
+
+                    # Update progress bar safely
+                    with lock:
+                        update_porcentage += update_porcentage_step
+                        self.view.update_progress(update_porcentage)
+
+            self.view.complete_operation(True)
+            self.view.add_log_message("Song URLs fetched successfully.")
+
+        # Start the background task in a new thread
+        threading.Thread(target=background_task, daemon=True).start()
 
     def cancel_update_operation(self):
         """Cancel the update operation in progress."""
