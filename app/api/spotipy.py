@@ -45,6 +45,11 @@ class SpotifyAPIHandler:
                 for item in results["items"]:
                     track = item["track"]
                     if track:  # Ensure the track object is not None
+                        if not track["name"] or not track["artists"]:
+                            print(
+                                f"Skipping track with missing or invalid name or artists: {track}"
+                            )
+                            continue
                         track_info = Song(
                             id=track["id"],
                             playlist_name=playlist_name,

@@ -21,7 +21,6 @@ class Downloader:
             "noplaylist": True,
             "extract_flat": True,
         }
-
         if not overwrite and song.youtube_url:
             return song.youtube_url
 

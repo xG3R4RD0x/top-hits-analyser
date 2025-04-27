@@ -2,12 +2,11 @@ from tkinter import Tk
 from app.view.main_view import MainView
 from app.view.menu_view import MainMenuView
 from app.view.database_view import DatabaseView
-from app.view.download_view import DownloadView
 from app.view.update_db_view import UpdateDBView
+
 # Import specific controllers
 from app.controller.menu_controller import MenuController
 from app.controller.database_controller import DatabaseController
-from app.controller.download_controller import DownloadController
 from app.controller.update_db_controller import UpdateDBController
 
 
@@ -15,7 +14,6 @@ class MainController:
     def __init__(self, root):
         # Initialize main view
         self.view = MainView(root)
-       
 
         # Create all frames/views needed for the application
         self.init_frames()
@@ -32,12 +30,6 @@ class MainController:
         # Create frame for database view with its controller
         db_controller = DatabaseController(self)
         db_frame = self.view.add_frame(DatabaseView, "database_view", db_controller)
-
-        # Create frame for download view with its controller
-        download_controller = DownloadController(self)
-        download_frame = self.view.add_frame(
-            DownloadView, "download_view", download_controller
-        )
 
         # Create frame for database update view with its controller
         update_db_controller = UpdateDBController(self)
