@@ -53,6 +53,12 @@ class Downloader:
             print(f"Could not find a video URL for {video_title}")
             return
 
+        # Check if the file already exists in the output path
+        output_file = os.path.join(output_path, f"{video_title}.mp3")
+        if os.path.exists(output_file):
+            print(f"The file '{output_file}' already exists. Skipping download.")
+            return
+
         ydl_opts = {
             "format": "bestaudio/best",
             "outtmpl": os.path.join(output_path, f"{video_title}.%(ext)s"),

@@ -159,6 +159,61 @@ class UpdateDBController(BaseController):
         # Start the background task in a new thread
         threading.Thread(target=background_task, daemon=True).start()
 
+    def download_songs(self):
+        """Download songs from the database using multithreading without blocking the GUI."""
+
+        def process_song(song, lock):
+            """Download a single song."""
+            if self.stop_update:
+                return
+
+            self.view.add_log_message(f"Downloading song: {song.name}")
+            Downloader.download_audio(song)
+
+            # Update progress bar safely
+            with lock:
+                nonlocal update_porcentage  # Declare as nonlocal to modify the outer variable
+                update_porcentage += update_porcentage_step
+                self.view.update_progress(update_porcentage)
+
+        def background_task():
+            """Background task to download songs."""
+            self.view.add_log_message("Downloading songs...")
+            songs = Songs.list_songs()
+            if not songs:
+                self.view.add_log_message("No songs found in the database.")
+                self.stop_update = True
+                self.view.complete_operation(False)
+                return
+
+            total_songs = len(songs)
+            nonlocal update_porcentage_step, update_porcentage  # Declare as nonlocal
+            update_porcentage_step = 100 / total_songs
+            update_porcentage = 0
+
+            # Lock for synchronizing shared resources
+            lock = threading.Lock()
+
+            # Use ThreadPoolExecutor for multithreading
+            with ThreadPoolExecutor(
+                max_workers=5
+            ) as executor:  # Adjust max_workers as needed
+                futures = [executor.submit(process_song, song, lock) for song in songs]
+
+                # Wait for all threads to complete
+                for future in futures:
+                    future.result()  # Raise exceptions if any occurred in threads
+
+            self.view.complete_operation(True)
+            self.view.add_log_message("Songs downloaded successfully.")
+
+        # Initialize variables in the outer scope
+        update_porcentage = 0
+        update_porcentage_step = 0
+
+        # Start the background task in a new thread
+        threading.Thread(target=background_task, daemon=True).start()
+
     def cancel_update_operation(self):
         """Cancel the update operation in progress."""
         print("UpdateDBController: Cancelling update operation...")
