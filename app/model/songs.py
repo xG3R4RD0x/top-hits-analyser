@@ -155,11 +155,24 @@ class Songs:
 
     @staticmethod
     def list_songs():
-        """Retrieve all songs."""
+        """Retrieve all songs as Song objects."""
         DB_CONNECTION = get_db_connection()
         cursor = DB_CONNECTION.cursor()
         cursor.execute("SELECT * FROM songs")
-        return cursor.fetchall()
+        rows = cursor.fetchall()
+        return [
+            Song(
+                id=row[0],
+                name=row[1],
+                playlist_name=row[2],
+                playlist_id=row[3],
+                release_date=row[4],
+                artist=row[5],
+                album=row[6],
+                youtube_url=row[7],
+            )
+            for row in rows
+        ]
 
     @staticmethod
     def check_field_value(song_id, field_name, value=None):

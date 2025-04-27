@@ -97,6 +97,13 @@ class UpdateDBView(BaseView):
         )
         self.start_update_button.pack(side="left", padx=10)
 
+        self.fetch_songs_button = ttk.Button(
+            self.buttons_frame,
+            text="Fetch Songs URLs",
+            command=self.fetch_songs_urls,
+        )
+        self.fetch_songs_button.pack(side="left", padx=10)
+
         self.cancel_button = ttk.Button(
             self.buttons_frame, text="Cancel Operation", command=self.cancel_operation
         )
@@ -150,6 +157,23 @@ class UpdateDBView(BaseView):
 
         # Force UI update
         self.update_idletasks()
+
+    def fetch_songs_urls(self):
+        """Fetch songs URLs from the database"""
+        self.is_operation_running = True
+        self.cancelled = False
+        self.cancel_button["state"] = "normal"
+        self.back_button["state"] = "disabled"
+
+        # Clear the log
+        self.log_text.configure(state="normal")
+        self.log_text.delete(1.0, tk.END)
+        self.log_text.configure(state="disabled")
+
+        # Reset the progress bar
+        self.update_progress(0)
+
+        self.controller.fetch_songs_urls()
 
     def start_operation(self):
         """Start the update operation"""

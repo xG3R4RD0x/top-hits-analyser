@@ -14,13 +14,16 @@ class Downloader:
         return f"{song.artist} - {song.name}"
 
     @staticmethod
-    def get_video_url(song):
+    def get_video_url(song, overwrite=False):
         """Searches YouTube for the song and retrieves the video URL."""
         ydl_opts = {
             "quiet": True,
             "noplaylist": True,
             "extract_flat": True,
         }
+
+        if not overwrite and song.youtube_url:
+            return song.youtube_url
 
         query = Downloader.build_song_title(song)
         with YoutubeDL(ydl_opts) as ydl:

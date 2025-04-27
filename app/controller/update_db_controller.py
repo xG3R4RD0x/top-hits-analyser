@@ -1,8 +1,7 @@
 from app.controller.base_controller import BaseController
-import time
 from app.model.playlists import Playlists
 from app.model.songs import Songs
-from app.model.song import Song
+from app.model.downloader import Downloader
 
 
 class UpdateDBController(BaseController):
@@ -58,7 +57,7 @@ class UpdateDBController(BaseController):
             update_porcentage += update_porcentage_step
             self.view.update_progress(update_porcentage)
 
-        self.view.update_progress(100)
+        self.view.complete_operation(True)
 
         self.view.add_log_message("Database update process completed.")
 
@@ -94,6 +93,42 @@ class UpdateDBController(BaseController):
         else:
             self.view.add_log_message(f"Found {len(songs)} songs:")
             return songs
+
+    def fetch_songs_urls(self):
+        """Fetch new songs URLS and add them to the database."""
+        self.view.add_log_message("Fetching songs URLs from the database...")
+        songs = Songs.list_songs()
+        total_songs = len(songs)
+        update_porcentage_step = 100 / total_songs
+        update_porcentage = 0
+        self.view.add_log_message(f"Found {total_songs} songs in the database.")
+        if not songs:
+            self.view.add_log_message("No songs found in the database.")
+            self.stop_update = True
+            self.view.complete_operation(False)
+            return
+
+        for song in songs:
+            self.view.add_log_message(f"Fetching URL for song: {song.name}")
+            video_url = Downloader.get_video_url(song)
+            if video_url:
+                if song.youtube_url == video_url:
+                    self.view.add_log_message(
+                        f"URL already exists for song: {song.name}"
+                    )
+                    update_porcentage += update_porcentage_step
+                    self.view.update_progress(update_porcentage)
+                    continue
+                song.youtube_url = video_url
+                Songs.update_song(song.id, {"youtube_url": video_url})
+                self.view.add_log_message(f"Updated URL for song: {song.name}")
+            else:
+                self.view.add_log_message(f"No URL found for song: {song.name}")
+            update_porcentage += update_porcentage_step
+            self.view.update_progress(update_porcentage)
+
+        self.view.complete_operation(True)
+        self.view.add_log_message("Song URLs fetched successfully.")
 
     def cancel_update_operation(self):
         """Cancel the update operation in progress."""
