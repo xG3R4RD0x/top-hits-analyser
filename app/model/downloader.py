@@ -1,18 +1,20 @@
 from yt_dlp import YoutubeDL
+import os
+from app.model.song import Song
 
 
 class Downloader:
-    def __init__(self, url: str):
-        self.url = url
+    def __init__(self):
+        pass
 
-    # 1. Function to get the URL of the music video from a song
     # 2. Function to download the audio of the song from the URL
-
-    def build_song_title(self, song):
+    @staticmethod
+    def build_song_title(song):
         """Builds the title of the song from a Song object."""
         return f"{song.artist} - {song.name}"
 
-    def get_video_url(self, song):
+    @staticmethod
+    def get_video_url(song):
         """Searches YouTube for the song and retrieves the video URL."""
         ydl_opts = {
             "quiet": True,
@@ -20,25 +22,33 @@ class Downloader:
             "extract_flat": True,
         }
 
-        query = self.build_song_title(song)
+        query = Downloader.build_song_title(song)
         with YoutubeDL(ydl_opts) as ydl:
             try:
                 result = ydl.extract_info(f"ytsearch:{query}", download=False)
                 if "entries" in result and len(result["entries"]) > 0:
-                    print(result)
+
                     return result["entries"][0]["url"]
             except Exception as e:
                 print(f"Error searching YouTube for {query}: {e}")
         return None
 
-    def download_audio(self, output_path="music/hits"):
+    @staticmethod
+    def download_audio(song: Song, output_path="music/hits"):
         """Downloads the audio of the song from the URL."""
-        import os
-        from yt_dlp import YoutubeDL
 
+        if song is None:
+            print("The song object cannot be None.")
+            return
+        # checks if the output path exists, if not creates it
         os.makedirs(output_path, exist_ok=True)
-        video_url = self.url
-        video_title = self.build_song_title(self)
+        video_url = song.youtube_url
+
+        video_title = Downloader.build_song_title(song)
+
+        if not video_url:
+            print(f"Could not find a video URL for {video_title}")
+            return
 
         ydl_opts = {
             "format": "bestaudio/best",

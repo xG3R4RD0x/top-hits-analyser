@@ -29,18 +29,18 @@ class SpotifyAPIHandler:
             )
             self._initialized = True
 
- 
     def get_tracks_from_playlist(self, playlist_id, playlist_name, limit=100):
         """Fetch tracks from a playlist and return them as Song objects."""
         tracks = []
+        print(str(limit))
         try:
             print(f"Fetching tracks from playlist: {playlist_id}")
             results = self.sp.playlist_items(
                 playlist_id,
                 limit=limit,
-                fields="items(track(id,name,artists(name),album(name,release_date))),next"
+                fields="items(track(id,name,artists(name),album(name,release_date))),next",
             )
-            
+
             while results:
                 for item in results["items"]:
                     track = item["track"]
@@ -50,12 +50,14 @@ class SpotifyAPIHandler:
                             playlist_name=playlist_name,
                             playlist_id=playlist_id,
                             name=self.sanitize_songname(track["name"]),
-                            artist=self.sanitize_songname(", ".join(artist["name"] for artist in track["artists"])),
+                            artist=self.sanitize_songname(
+                                ", ".join(artist["name"] for artist in track["artists"])
+                            ),
                             album=track["album"]["name"],
                             release_date=track["album"]["release_date"],
                         )
                         tracks.append(track_info)
-                
+
                 # Check if there is a next page
                 if results["next"]:
                     results = self.sp.next(results)
@@ -66,7 +68,6 @@ class SpotifyAPIHandler:
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
         return tracks
-    
 
     def read_playlist_ids(self, json_file_path):
         try:

@@ -87,7 +87,7 @@ class Songs:
         DB_CONNECTION.commit()
 
     @staticmethod
-    def get_song(song_id) -> Song:
+    def get_song(song_id):
         """Retrieve a song by its ID."""
         DB_CONNECTION = get_db_connection()
         cursor = DB_CONNECTION.cursor()
@@ -115,26 +115,41 @@ class Songs:
         DB_CONNECTION.commit()
 
     @staticmethod
-    def update_song(song: Song):
-        """Update a song's details."""
+    def update_song(song_id, updates: dict):
+        """Update a song's details with the provided updates."""
+        if not updates:
+            return  # No updates to apply
+
+        # Define allowed keys for updates
+        allowed_keys = {
+            "name",
+            "playlist_name",
+            "playlist_id",
+            "release_date",
+            "artist",
+            "album",
+            "youtube_url",
+        }
+
+        # Validate that all keys in updates are allowed
+        if not all(key in allowed_keys for key in updates):
+            raise ValueError("One or more keys in updates are not allowed.")
+
         DB_CONNECTION = get_db_connection()
         cursor = DB_CONNECTION.cursor()
+
+        # Build the SET clause dynamically based on the updates dictionary
+        set_clause = ", ".join(f"{key} = ?" for key in updates)
+        values = list(updates.values())
+        values.append(song_id)
+
         cursor.execute(
-            """
+            f"""
             UPDATE songs
-            SET name = ?, playlist_name = ?, playlist_id = ?, release_date = ?, artist = ?, album = ?, youtube_url = ?
+            SET {set_clause}
             WHERE id = ?
-        """,
-            (
-                song.name,
-                song.playlist_name,
-                song.playlist_id,
-                song.release_date,
-                song.artist,
-                song.album,
-                song.youtube_url,
-                song.id,
-            ),
+            """,
+            values,
         )
         DB_CONNECTION.commit()
 

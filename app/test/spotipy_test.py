@@ -2,6 +2,7 @@ import unittest
 from app.api.spotipy import SpotifyAPIHandler
 from app.model.song import Song
 
+
 class TestSpotifyAPIHandler(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -13,13 +14,15 @@ class TestSpotifyAPIHandler(unittest.TestCase):
         print("\nTesting get_tracks_from_playlist...")
         playlist_id = "6PH7Dt6RC8R3CZJseARXue"
         playlist_name = "REGGAETON ECUADOR"
-        tracks = self.spotify_handler.get_tracks_from_playlist(playlist_id, playlist_name, limit=5)
+        tracks = self.spotify_handler.get_tracks_from_playlist(
+            playlist_id, playlist_name, limit=5
+        )
         # print(f"Tracks retrieved: {tracks}")
         print(f"Tracks retrieved: {str(len(tracks))}")
         self.assertIsInstance(tracks, list)
         for track in tracks:
             self.assertIsInstance(track, Song)
-          
+
         self.assertGreater(len(tracks), 0)
 
     # def test_read_playlist_ids(self):
@@ -41,6 +44,7 @@ class TestSpotifyAPIHandler(unittest.TestCase):
     #     self.assertNotIn(":", sanitized_name)
     #     self.assertNotIn("*", sanitized_name)
     #     self.assertNotIn("?", sanitized_name)
+
 
 if __name__ == "__main__":
     unittest.main()

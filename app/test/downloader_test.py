@@ -1,54 +1,50 @@
 import unittest
-from unittest.mock import patch, MagicMock
 from app.model.downloader import Downloader
-
-
-class Song:
-    """Mock Song class for testing."""
-
-    def __init__(self, artist, name):
-        self.artist = artist
-        self.name = name
+from app.model.song import Song
+from app.model.songs import Songs
+from app.model.playlists import Playlists
+import os
 
 
 class TestDownloader(unittest.TestCase):
-    @patch("app.model.downloader.YoutubeDL")
-    def test_get_video_url(self, mock_youtubedl):
-        # Arrange
-        song = Song(artist="Artist", name="Song")
-        mock_ydl_instance = MagicMock()
-        mock_youtubedl.return_value.__enter__.return_value = mock_ydl_instance
-        mock_ydl_instance.extract_info.return_value = {
-            "entries": [{"url": "https://youtube.com/video1"}]
-        }
-        downloader = Downloader(url="")
 
-        # Act
-        video_url = downloader.get_video_url(song)
+    @classmethod
+    def setUpClass(cls):
+        """Set up a test song for the class."""
+        cls.test_song = cls.get_test_song()
 
-        # Assert
-        self.assertEqual(video_url, "https://youtube.com/video1")
-        mock_ydl_instance.extract_info.assert_called_once_with(
-            "ytsearch:Artist - Song", download=False
-        )
+    @classmethod
+    def get_test_song(cls):
+        """Get a test song."""
+        playlists = Playlists.list_playlists()
+        if not playlists:
+            raise ValueError("No playlists available.")
 
-    @patch("app.model.downloader.YoutubeDL")
-    @patch("os.makedirs")
-    def test_download_audio(self, mock_makedirs, mock_youtubedl):
-        # Arrange
-        mock_ydl_instance = MagicMock()
-        mock_youtubedl.return_value.__enter__.return_value = mock_ydl_instance
-        downloader = Downloader(url="https://youtube.com/video1")
-        downloader.build_song_title = MagicMock(return_value="Artist - Song")
+        first_playlist = playlists[1]
+        songs = Songs.list_songs_from_playlist(first_playlist.playlist_id)
+        if not songs:
+            raise ValueError("No songs available in the first playlist.")
+        return songs[0]
 
-        # Act
-        downloader.download_audio(output_path="test_music")
+    def test_get_video_url(self):
+        video_url = Downloader.get_video_url(self.test_song)
 
-        # Assert
-        mock_makedirs.assert_called_once_with("test_music", exist_ok=True)
-        mock_ydl_instance.download.assert_called_once_with(
-            ["https://youtube.com/video1"]
-        )
+        self.assertIsNotNone(video_url)
+        self.assertTrue(video_url.startswith("http"))
+        self.assertTrue("youtube.com" in video_url)
+
+    def test_download_audio(self):
+        """Test the download_audio function."""
+        print("\nTesting download_audio...")
+        song = self.test_song
+        video_url = Downloader.get_video_url(song)
+        Songs.update_song(self.test_song.id, {"youtube_url": video_url})
+        song = Songs.get_song(self.test_song.id)
+        print(f"Song: {song}")
+        Downloader.download_audio(song, output_path="download_test")
+        print(f"Audio file path: ./download_test/{song.artist} - {song.name}.mp3")
+        audio_file_path = f"./download_test/{song.artist} - {song.name}.mp3"
+        self.assertTrue(os.path.exists(audio_file_path))
 
 
 if __name__ == "__main__":
