@@ -19,5 +19,20 @@ class Song:
         self.release_date = release_date
         self.youtube_url = youtube_url
 
+    def __iter__(self):
+        """Make the object iterable by returning an iterator over its attributes."""
+        return iter(
+            {
+                "id": self.id,
+                "playlist_name": self.playlist_name,
+                "playlist_id": self.playlist_id,
+                "name": self.name,
+                "artist": self.artist,
+                "album": self.album,
+                "release_date": self.release_date,
+                "youtube_url": self.youtube_url,
+            }.items()
+        )
+
     def __repr__(self):
         return f"Song(id={self.id}, playlist_name={self.playlist_name}, playlist_id={self.playlist_id}, name='{self.name}', artist='{self.artist}', album='{self.album}', release_date={self.release_date})"

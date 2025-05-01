@@ -104,12 +104,12 @@ class UpdateDBView(BaseView):
         )
         self.fetch_songs_button.pack(side="left", padx=10)
 
-        self.download_songs_button = ttk.Button(
+        self.fetch_songs_button = ttk.Button(
             self.buttons_frame,
             text="Download Songs",
             command=self.download_songs,
         )
-        self.download_songs_button.pack(side="left", padx=10)
+        self.fetch_songs_button.pack(side="left", padx=10)
 
         self.cancel_button = ttk.Button(
             self.buttons_frame, text="Cancel Operation", command=self.cancel_operation
