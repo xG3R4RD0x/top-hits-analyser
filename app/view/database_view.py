@@ -31,7 +31,9 @@ class DatabaseView(BaseView):
         self.back_button.pack(side="left", padx=5)
 
         self.refresh_button = ttk.Button(
-            self.buttons_frame, text="Actualizar Datos", command=self.refresh_data
+            self.buttons_frame,
+            text="Mostrar todas las canciones",
+            command=self.fetch_all_songs,
         )
         self.refresh_button.pack(side="right", padx=5)
 
@@ -74,22 +76,32 @@ class DatabaseView(BaseView):
         self.content_frame.grid_columnconfigure(0, weight=1)
         self.content_frame.grid_rowconfigure(0, weight=1)
 
-    def refresh_data(self):
+    def fetch_all_songs(self):
         """Actualizar los datos en la vista"""
-        self.trigger_event("refresh_database")
+        self.trigger_event("fetch_all_songs")
 
     def go_to_main_menu(self):
         """Volver al menú principal"""
         self.trigger_event("navigate_to", "main_menu")
 
-    def add_data(self, data_list):
+    def add_data(self, songs):
         """Añadir datos al tree view"""
         # Limpiar datos actuales
         for item in self.tree.get_children():
             self.tree.delete(item)
 
         # Añadir nuevos datos
-        for i, (playlist, name, artist, album, date, url) in enumerate(data_list):
+        for i, song in enumerate(songs):
             self.tree.insert(
-                "", "end", iid=i, values=(playlist, name, artist, album, date, url)
+                "",
+                "end",
+                iid=i,
+                values=(
+                    song.playlist_name,
+                    song.name,
+                    song.artist,
+                    song.album,
+                    song.release_date,
+                    song.youtube_url,
+                ),
             )

@@ -13,9 +13,7 @@ class MenuController(BaseController):
         self.view.register_event_handler(
             "update_songs_database", self.update_songs_database
         )
-        self.view.register_event_handler(
-            "download_with_database", self.download_with_database
-        )
+
         self.view.register_event_handler("view_database", self.view_database)
 
     def update_and_download(self):
@@ -37,14 +35,7 @@ class MenuController(BaseController):
         print("MenuController: Holaaa")
 
         self.navigate_to("update_db_view")
-        update_view = self.main_controller.view.frames["update_db_view"]
-        # update_controller = update_view.controller
-        # update_controller.start_update_process()
-
-    def download_with_database(self):
-        """Download songs using the current database."""
-        print("MenuController: Songs downloading with current database.")
-        self.navigate_to("download_view")
+        # update_view = self.main_controller.view.frames["update_db_view"]
 
     def view_database(self):
         """View database content."""
