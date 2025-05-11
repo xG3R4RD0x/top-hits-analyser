@@ -4,6 +4,7 @@ from app.model.songs import Songs
 from app.model.downloader import Downloader
 import threading
 from concurrent.futures import ThreadPoolExecutor
+from app.view.manage_playlists_view import ManagePlaylistsView
 
 
 class ManagePlaylistsController(BaseController):
@@ -19,7 +20,6 @@ class ManagePlaylistsController(BaseController):
         self.view.register_event_handler(
             "cancel_update_operation", self.cancel_update_operation
         )
-
     def handle_navigation(self, view_name):
         """Handle navigation events from the view"""
         self.navigate_to(view_name)
@@ -31,6 +31,14 @@ class ManagePlaylistsController(BaseController):
     # y otro para eliminar una playlist existente
     # debe haber uno para editar el nombre de la playlist
     # además se debe crear una funcion para extraer el ID y el nombre directo de la URL de la playlist
+
+    def update_view(self):
+        playlists = Playlists.list_playlists()
+        self.view.load_playlists(playlists)
+        
+        print("Manage playlist controller updated")
+        
+        
 
     def cancel_update_operation(self):
         """Cancel the update operation in progress."""

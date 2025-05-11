@@ -18,6 +18,17 @@ class ManagePlaylistsView(BaseView):
         self.main_frame = ttk.Frame(self)
         self.main_frame.pack(fill="both", expand=True, padx=10, pady=10)
         
+        # Action buttons
+        self.buttons_frame = ttk.Frame(self)
+        self.buttons_frame.pack(fill="x", pady=10)
+        
+        self.back_button = ttk.Button(
+            self.buttons_frame,
+            text="Back to Main Menu",
+            command=self.go_to_main_menu,
+        )
+        self.back_button.pack(side="left", padx=10)
+        
         # Playlists management section
         self.playlists_frame = ttk.LabelFrame(self.main_frame, text="Current Playlists")
         self.playlists_frame.pack(fill="both", expand=True, pady=10)
@@ -47,10 +58,10 @@ class ManagePlaylistsView(BaseView):
         self.playlists_tree.heading("delete", text="Delete")
         
         # Column widths
-        self.playlists_tree.column("name", width=300, anchor="w")
-        self.playlists_tree.column("edit", width=50, anchor="center")
-        self.playlists_tree.column("delete", width=50, anchor="center")
-        
+        self.playlists_tree.column("name", width=200, anchor="w")
+        self.playlists_tree.column("edit", width=20, anchor="center")
+        self.playlists_tree.column("delete", width=20, anchor="center")
+          
         # Add scrollbar
         scrollbar = ttk.Scrollbar(
             self.playlists_frame, 
@@ -70,6 +81,10 @@ class ManagePlaylistsView(BaseView):
         # Log frame
         self.log_frame = ttk.Frame(self.main_frame)
         self.log_frame.pack(fill="both", expand=True, pady=10)
+        
+    def go_to_main_menu(self):
+        """Go back to main menu"""
+        self.trigger_event("navigate_to", "main_menu")
         
     def load_playlists(self, playlists):
         """Load playlists into the treeview"""

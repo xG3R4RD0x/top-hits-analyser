@@ -41,7 +41,6 @@ class MainController:
         manage_playlists_controller = ManagePlaylistsController(self)
         manage_playlists_frame = self.view.add_frame(
             ManagePlaylistsView, "manage_playlists_view", manage_playlists_controller
-            
         )
 
     def navigate_to(self, view_name):
@@ -50,7 +49,14 @@ class MainController:
         Args:
             view_name: The name of the view to display.
         """
-        return self.view.show_frame(view_name)
+        
+        # Show the frame and get a reference to it
+        frame = self.view.show_frame(view_name)
+        
+        
+        # Update current_view
+        frame.update()
+        return frame
 
 
 if __name__ == "__main__":
