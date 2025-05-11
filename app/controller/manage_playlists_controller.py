@@ -6,7 +6,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 
 
-class UpdatePlaylistsController(BaseController):
+class ManagePlaylistsController(BaseController):
     """Specific controller for the database update view"""
 
     def __init__(self, main_controller):

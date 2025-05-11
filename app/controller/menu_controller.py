@@ -9,8 +9,8 @@ class MenuController(BaseController):
         self.view.register_event_handler(
             "update_and_download", self.update_and_download
         )
-        self.view.register_event_handler("update_playlists", self.update_playlists)
         self.view.register_event_handler("view_database", self.view_database)
+        self.view.register_event_handler("manage_playlists", self.manage_playlists)
 
     def update_and_download(self):
         """Update the database and download songs."""
@@ -28,3 +28,8 @@ class MenuController(BaseController):
         """View database content."""
         print("MenuController: Showing database content...")
         self.navigate_to("database_view")
+        
+    def manage_playlists(self):
+        """Manage playlists."""
+        print("MenuController: Managing playlists...")
+        self.navigate_to("manage_playlists_view")

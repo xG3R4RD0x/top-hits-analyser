@@ -33,8 +33,8 @@ class MainMenuView(BaseView):
 
         self.update_playlists_button = ttk.Button(
             self.buttons_frame,
-            text="Actualizar playlists",
-            command=self.update_playlists,
+            text="Gestionar playlists",
+            command=self.manage_playlists,
         )
         self.update_playlists_button.pack(fill="x", pady=5)
 
@@ -46,6 +46,6 @@ class MainMenuView(BaseView):
         """Trigger the 'view_database' event."""
         self.trigger_event("view_database")
 
-    def update_playlists(self):
-        """Trigger the 'update_playlists' event."""
-        self.trigger_event("update_playlists")
+    def manage_playlists(self):
+        """Trigger the 'manage_playlists' event."""
+        self.trigger_event("manage_playlists")
