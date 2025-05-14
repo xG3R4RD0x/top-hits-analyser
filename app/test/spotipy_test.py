@@ -29,15 +29,15 @@ class TestSpotifyAPIHandler(unittest.TestCase):
         """Test the get_playlist_metadata_from_URL function."""
         print("\nTesting get_playlist_metadata_from_URL...")
         url = "https://open.spotify.com/playlist/7f5zjJSNPqd8zsyavpPP4n?si=382b11980c0e43ec"
-        metadata = self.spotify_handler.get_playlist_metadata_from_url(
+        id, name = self.spotify_handler.get_playlist_metadata_from_url(
             url
         )
-        print(metadata)
+        print(f"playlist metadata from URL: #{id}-#{name}")
         self.assertEqual(
-            metadata["id"], "7f5zjJSNPqd8zsyavpPP4n"
+            id, "7f5zjJSNPqd8zsyavpPP4n"
         )
         self.assertEqual(
-            metadata["name"], "Ecuador Alternativo 🇪🇨"
+            name, "Ecuador Alternativo 🇪🇨"
         ) 
 
     # def test_read_playlist_ids(self):

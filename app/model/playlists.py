@@ -25,16 +25,29 @@ class Playlists:
         DB_CONNECTION.commit()
 
     @staticmethod
-    def add_playlist(playlist: Playlist):
-        """Add a new playlist to the database."""
+    def add_playlist(playlist=None, id=None, name=None, genre=None):
+        """
+        Add a new playlist to the database.
+        Puedes pasar un objeto Playlist, o los parámetros id, name, genre.
+        Hay que pasar en el parametro el nombre dle parametro 
+        
+        
+        """
+        if playlist is not None and isinstance(playlist, Playlist):
+            obj = playlist
+        elif id is not None and name is not None:
+            obj = Playlist(playlist_id=id, name=name, genre=genre)
+        else:
+            raise ValueError("Debes pasar un objeto Playlist o los parámetros id y name.")
+
         DB_CONNECTION = get_db_connection()
         cursor = DB_CONNECTION.cursor()
         cursor.execute(
             """
             INSERT INTO playlists (playlist_id, name, genre)
             VALUES (?, ?, ?)
-        """,
-            playlist.to_tuple(),
+            """,
+            obj.to_tuple(),
         )
         DB_CONNECTION.commit()
 

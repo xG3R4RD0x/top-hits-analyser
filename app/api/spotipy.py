@@ -101,7 +101,11 @@ class SpotifyAPIHandler:
                 playlist_id, 
                 fields="id,name"
             )           
-                return metadata
+                
+                id= metadata["id"]
+                name = metadata["name"]
+                
+                return id, name
             
         except Exception as e:
             print(f"Error extracting metadata from URL: {e}")

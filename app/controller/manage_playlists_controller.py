@@ -20,6 +20,8 @@ class ManagePlaylistsController(BaseController):
         self.view.register_event_handler(
             "cancel_update_operation", self.cancel_update_operation
         )
+        self.view.register_event_handler("extract_data_from_url", self.extract_data_from_url)
+        self.view.register_event_handler("save_new_playlist", self.save_new_playlist)
     def handle_navigation(self, view_name):
         """Handle navigation events from the view"""
         self.navigate_to(view_name)
@@ -46,3 +48,16 @@ class ManagePlaylistsController(BaseController):
         self.view.cancelled = True
         self.stop_update = True
         self.view.complete_operation(False)
+        
+    def extract_data_from_url(self, url):
+        id, name = self.sp.get_playlist_metadata_from_url(url)
+        if id is None or name is None:
+            id, name = "", ""
+        print(f"Extracted data from URL: {id}, {name}")
+        self.view.on_url_data_extracted(id, name)
+        
+    def save_new_playlist(self, id, name):
+        """Save a new playlist to the database."""
+        print(f"Saving new playlist: {id}, {name}")
+        Playlists.add_playlist(id= id, name = name)
+        self.update_view()

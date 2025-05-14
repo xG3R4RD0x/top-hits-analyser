@@ -37,10 +37,17 @@ class ManagePlaylistsView(BaseView):
         self.form_frame = ttk.Frame(self.playlists_section)
         self.form_frame.pack(fill="x", padx=5, pady=(0, 2))
         self.form_frame.grid_columnconfigure(1, weight=1)
+        self.form_frame.grid_columnconfigure(2, weight=0)
 
         ttk.Label(self.form_frame, text="URL:").grid(row=0, column=0, sticky="w", padx=2, pady=2)
         self.url_entry = ttk.Entry(self.form_frame)
         self.url_entry.grid(row=0, column=1, sticky="ew", padx=2, pady=2)
+        self.extract_button = ttk.Button(
+            self.form_frame,
+            text="Extraer datos desde url",
+            command=self.extract_data_from_url
+        )
+        self.extract_button.grid(row=0, column=2, sticky="w", padx=2, pady=2)
 
         ttk.Label(self.form_frame, text="ID:").grid(row=1, column=0, sticky="w", padx=2, pady=2)
         self.id_entry = ttk.Entry(self.form_frame)
@@ -151,11 +158,11 @@ class ManagePlaylistsView(BaseView):
         self.show_add_form()
 
     def save_new_playlist(self):
-        """Handler para guardar el nuevo playlist (placeholder)"""
-        url = self.url_entry.get()
+        
         playlist_id = self.id_entry.get()
         name = self.name_entry.get()
-        print(f"Guardar playlist: url={url}, id={playlist_id}, nombre={name}")
+        print(f"Guardar playlist: id={playlist_id}, nombre={name}")
+        self.trigger_event("save_new_playlist", playlist_id, name)
         self.hide_add_form()
         # Aquí se puede agregar lógica para notificar al controlador
 
@@ -185,3 +192,16 @@ class ManagePlaylistsView(BaseView):
                 self.edit_playlist(item)
             elif col_num == 3:  # Delete column
                 self.delete_playlist(item)
+
+    def extract_data_from_url(self):
+        """Handler para el botón 'Extraer datos desde url'"""
+        url = self.url_entry.get()
+        self.trigger_event("extract_data_from_url", url)
+
+    def on_url_data_extracted(self, playlist_id, name):
+        """Recibe datos extraídos desde el controller y los muestra en el formulario"""
+        self.id_entry.delete(0, tk.END)
+        self.id_entry.insert(0, playlist_id)
+        self.name_entry.delete(0, tk.END)
+        self.name_entry.insert(0, name)
+
