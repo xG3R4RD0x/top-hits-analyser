@@ -33,13 +33,15 @@ class ManagePlaylistsView(BaseView):
         self.playlists_section = ttk.Frame(self.main_frame)
         self.playlists_section.pack(fill="both", expand=True, pady=10)
 
-        # --- Add Playlist Form Block (outside the playlists_frame, above the list) ---
+        # --- Add/Edit Playlist Form Block (outside the playlists_frame, above the list) ---
         self.form_frame = ttk.Frame(self.playlists_section)
         self.form_frame.pack(fill="x", padx=5, pady=(0, 2))
         self.form_frame.grid_columnconfigure(1, weight=1)
         self.form_frame.grid_columnconfigure(2, weight=0)
 
-        ttk.Label(self.form_frame, text="URL:").grid(row=0, column=0, sticky="w", padx=2, pady=2)
+        # Campo URL (solo visible en modo agregar)
+        self.url_label = ttk.Label(self.form_frame, text="URL:")
+        self.url_label.grid(row=0, column=0, sticky="w", padx=2, pady=2)
         self.url_entry = ttk.Entry(self.form_frame)
         self.url_entry.grid(row=0, column=1, sticky="ew", padx=2, pady=2)
         self.extract_button = ttk.Button(
@@ -64,7 +66,6 @@ class ManagePlaylistsView(BaseView):
         self.cancel_button = ttk.Button(self.form_buttons_frame, text="Cancelar", command=self.hide_add_form)
         self.cancel_button.pack(side="left", padx=2)
 
-        # Ocultar el formulario al inicio y reservar poco espacio
         self.form_frame.pack_forget()
         self.form_placeholder = tk.Frame(self.playlists_section, height=10)  # Espacio mínimo
         self.form_placeholder.pack(fill="x", padx=5, pady=(0, 2))
@@ -141,17 +142,33 @@ class ManagePlaylistsView(BaseView):
             ))
             
     def show_add_form(self):
-        """Muestra el formulario y oculta el placeholder"""
+        """Muestra el formulario para agregar playlist (modo agregar)"""
+        self._edit_mode = False
         self.form_placeholder.pack_forget()
         self.form_frame.pack(fill="x", padx=5, pady=(0, 2))
         self.url_entry.delete(0, tk.END)
         self.id_entry.delete(0, tk.END)
         self.name_entry.delete(0, tk.END)
+        # Botón guardar llama a save_new_playlist
+        self.save_button.config(text="Guardar", command=self.save_new_playlist)
 
     def hide_add_form(self):
         """Oculta el formulario y muestra el placeholder"""
         self.form_frame.pack_forget()
         self.form_placeholder.pack(fill="x", padx=5, pady=(0, 2))
+
+    def show_edit_form(self, playlist_id, name):
+        """Muestra el formulario para editar playlist (modo edición)"""
+        self._edit_mode = True
+        self.form_placeholder.pack_forget()
+        self.form_frame.pack(fill="x", padx=5, pady=(0, 2))
+        self.id_entry.delete(0, tk.END)
+        self.id_entry.insert(0, playlist_id)
+        self.name_entry.delete(0, tk.END)
+        self.name_entry.insert(0, name)
+        # Botón guardar llama a update_playlist
+        self.save_button.config(text="Guardar cambios", command=self.update_playlist)
+        self._editing_item_id = playlist_id
 
     def add_playlist(self):
         """Handler para el botón de agregar playlist"""
@@ -168,10 +185,29 @@ class ManagePlaylistsView(BaseView):
 
     def edit_playlist(self, item_id):
         """Handler for edit playlist action"""
-        # This will be connected to controller later
-        playlist_name = self.playlists_tree.item(item_id)['values'][0]
-        print(f"Edit playlist: {playlist_name}")
-        
+        # Obtener datos del item seleccionado
+        values = self.playlists_tree.item(item_id)['values']
+        playlist_name = values[0]
+        # Suponiendo que el ID está en el campo name (ajustar si hay un campo id real)
+        playlist_id = playlist_name  # Cambiar si hay columna id
+        # Si tienes acceso al objeto playlist, usa su id real
+        self.show_edit_form(playlist_id, playlist_name)
+
+    def update_playlist(self):
+        playlist_id = self.id_entry.get()
+        name = self.name_entry.get()
+        print(f"Actualizar playlist: id={playlist_id}, nombre={name}")
+        self.trigger_event("update_playlist", playlist_id, name)
+        self.hide_add_form()
+
+    def save_edited_playlist(self):
+        """Guardar cambios de la playlist editada"""
+        playlist_id = self.edit_id_entry.get()
+        name = self.edit_name_entry.get()
+        print(f"Guardar edición playlist: id={playlist_id}, nombre={name}")
+        self.trigger_event("save_edited_playlist", playlist_id, name)
+        self.hide_edit_form()
+
     def delete_playlist(self, item_id):
         """Handler for delete playlist action"""
         # This will be connected to controller later
