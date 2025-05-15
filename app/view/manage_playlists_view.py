@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 
 from app.view.base_view import BaseView
+from app.model.playlists import Playlists
+from app.model.playlist import Playlist
 
 
 class ManagePlaylistsView(BaseView):
@@ -160,21 +162,23 @@ class ManagePlaylistsView(BaseView):
         """Oculta los campos y botones guardar/cancelar, muestra solo el botón volver"""
         self.form_fields_frame.pack_forget()
         self.form_actions_frame.pack_forget()
-        self.back_button_alone.pack(fill="x", pady=(5, 2))
+        self.back_button_alone.pack(side="left", padx=2)
 
-    def show_edit_form(self, playlist_id, name):
+    def show_edit_form(self, playlist: Playlist):
         """Muestra el formulario para editar playlist (modo edición)"""
         self._edit_mode = True
         self.form_fields_frame.pack(fill="x", expand=True)
         self.form_actions_frame.pack(fill="x", pady=(5, 2))
         self.form_buttons_inner_frame.pack(side="left", padx=10)
         self.back_button_alone.pack_forget()  # Oculta el botón solo
+        self.url_entry.delete(0, tk.END)
+        self.url_entry.insert(0, playlist.url)
         self.id_entry.delete(0, tk.END)
-        self.id_entry.insert(0, playlist_id)
+        self.id_entry.insert(0, playlist.playlist_id)
         self.name_entry.delete(0, tk.END)
-        self.name_entry.insert(0, name)
+        self.name_entry.insert(0, playlist.name)
         self.save_button.config(text="Guardar cambios", command=self.update_playlist)
-        self._editing_item_id = playlist_id
+        self._editing_item_id = playlist.playlist_id
 
     def add_playlist(self):
         """Handler para el botón de agregar playlist"""
@@ -193,17 +197,19 @@ class ManagePlaylistsView(BaseView):
         """Handler for edit playlist action"""
         # Obtener datos del item seleccionado
         values = self.playlists_tree.item(item_id)['values']
-        playlist_name = values[0]
-        # Suponiendo que el ID está en el campo name (ajustar si hay un campo id real)
-        playlist_id = playlist_name  # Cambiar si hay columna id
-        # Si tienes acceso al objeto playlist, usa su id real
-        self.show_edit_form(playlist_id, playlist_name)
+        playlist = Playlists.get_playlist_by_name(values[0])
+        
+        self.show_edit_form(playlist)
 
     def update_playlist(self):
+        playlist_to_edit = Playlists.get_playlist(self._editing_item_id)
+        if playlist_to_edit is None:
+            print(f"Playlist with ID {self._editing_item_id} not found.")
+            return
         playlist_id = self.id_entry.get()
         name = self.name_entry.get()
         print(f"Actualizar playlist: id={playlist_id}, nombre={name}")
-        self.trigger_event("update_playlist", playlist_id, name)
+        self.trigger_event("update_playlist", playlist_to_edit, playlist_id, name)
         self.hide_add_form()
 
     def save_edited_playlist(self):
