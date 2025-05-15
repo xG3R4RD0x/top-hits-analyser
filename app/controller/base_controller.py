@@ -10,6 +10,7 @@ class BaseController:
         Args:
             main_controller: Reference to the main controller
         """
+        print("called base controller")
         self.main_controller = main_controller
         self.view = None
         self.sp = sp()
@@ -30,6 +31,13 @@ class BaseController:
         Each controller subclass should implement this method.
         """
         raise NotImplementedError("Specific controllers must implement this method")
+    
+    def update_view(self):
+        """
+        This method is called to update the view on show
+        Just in case it needs to fetchs data automatically on show
+        """
+        pass
 
     def navigate_to(self, view_name):
         """

@@ -85,6 +85,46 @@ class SpotifyAPIHandler:
         except Exception as e:
             print(f"Error reading JSON file: {e}")
             return []
+        
+    def get_playlist_metadata_from_url(self, url):
+        """Extract playlist ID and name from a Spotify URL.
+        
+        fields for playlist:
+        https://developer.spotify.com/documentation/web-api/reference/get-playlist
+        
+        """
+        try:
+                playlist_id = self.get_id_from_url(url)
+                print(f"Extracted playlist ID: {playlist_id}")
+              
+                metadata = self.sp.playlist(
+                playlist_id, 
+                fields="id,name"
+            )           
+                
+                id= metadata["id"]
+                name = metadata["name"]
+                
+                return id, name
+            
+        except Exception as e:
+            print(f"Error extracting metadata from URL: {e}")
+            return None, None
+
+
+    def get_id_from_url(self, url):
+        """Extract playlist ID from a Spotify URL."""
+        try:
+            match = re.search(r"playlist/([^?]+)", url)
+            if match:
+                playlist_id = match.group(1)  # Extract the playlist ID
+                return playlist_id
+            else:
+                print("No playlist ID found in the URL.")
+                return None
+        except Exception as e:
+            print(f"Error extracting ID from URL: {e}")
+            return None
 
     def sanitize_songname(self, name: str) -> str:
         illegal_chars_pattern = r'[\/:*?"<>|\\-]'

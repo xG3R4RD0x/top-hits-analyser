@@ -24,9 +24,24 @@ class TestSpotifyAPIHandler(unittest.TestCase):
             self.assertIsInstance(track, Song)
 
         self.assertGreater(len(tracks), 0)
+        
+    def test_get_playlist_metadata_from_url(self):
+        """Test the get_playlist_metadata_from_URL function."""
+        print("\nTesting get_playlist_metadata_from_URL...")
+        url = "https://open.spotify.com/playlist/7f5zjJSNPqd8zsyavpPP4n?si=382b11980c0e43ec"
+        id, name = self.spotify_handler.get_playlist_metadata_from_url(
+            url
+        )
+        print(f"playlist metadata from URL: #{id}-#{name}")
+        self.assertEqual(
+            id, "7f5zjJSNPqd8zsyavpPP4n"
+        )
+        self.assertEqual(
+            name, "Ecuador Alternativo 🇪🇨"
+        ) 
 
     # def test_read_playlist_ids(self):
-    #     """Test the read_playlist_ids function."""
+    #    """Test the read_playlist_ids function."""
     #     print("\nTesting read_playlist_ids...")
     #     json_file_path = "playlists.json"  # Replace with the path to your JSON file
     #     playlists = self.spotify_handler.read_playlist_ids(json_file_path)

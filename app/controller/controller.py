@@ -3,11 +3,13 @@ from app.view.main_view import MainView
 from app.view.menu_view import MainMenuView
 from app.view.database_view import DatabaseView
 from app.view.update_db_view import UpdateDBView
+from app.view.manage_playlists_view import ManagePlaylistsView
 
 # Import specific controllers
 from app.controller.menu_controller import MenuController
 from app.controller.database_controller import DatabaseController
 from app.controller.update_db_controller import UpdateDBController
+from app.controller.manage_playlists_controller import ManagePlaylistsController
 
 
 class MainController:
@@ -34,7 +36,11 @@ class MainController:
         # Create frame for database update view with its controller
         update_db_controller = UpdateDBController(self)
         update_db_frame = self.view.add_frame(
-            UpdateDBView, "update_db_view", update_db_controller
+            UpdateDBView, "update_db_view", update_db_controller)
+            
+        manage_playlists_controller = ManagePlaylistsController(self)
+        manage_playlists_frame = self.view.add_frame(
+            ManagePlaylistsView, "manage_playlists_view", manage_playlists_controller
         )
 
     def navigate_to(self, view_name):
@@ -43,7 +49,14 @@ class MainController:
         Args:
             view_name: The name of the view to display.
         """
-        return self.view.show_frame(view_name)
+        
+        # Show the frame and get a reference to it
+        frame = self.view.show_frame(view_name)
+        
+        
+        # Update current_view
+        frame.update()
+        return frame
 
 
 if __name__ == "__main__":

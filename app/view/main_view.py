@@ -87,7 +87,6 @@ class MainView:
         # Mostrar el frame solicitado
         frame = self.frames[frame_name]
         frame.pack(fill="both", expand=True)
-
         return frame
 
 

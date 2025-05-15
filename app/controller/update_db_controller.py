@@ -77,12 +77,7 @@ class UpdateDBController(BaseController):
                 playlist_info = (
                     f"Playlist: {playlist.name} (ID: {playlist.playlist_id})"
                 )
-                if playlist.genre:
-                    playlist_info += f", Genre: {playlist.genre}"
-                self.view.add_log_message(playlist_info)
-                playlist_list.append(
-                    (playlist.name, playlist.playlist_id, playlist.genre)
-                )
+                
             self.view.add_log_message("Playlist information loaded successfully.")
             return playlist_list
 
