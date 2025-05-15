@@ -12,79 +12,31 @@ class ManagePlaylistsView(BaseView):
         self.view_label = ttk.Label(
             self, text="Manage Playlists", font=("Helvetica", 14)
         )
-        self.view_label.pack(pady=10)
+        self.view_label.pack(pady=0)
 
         # Main container
         self.main_frame = ttk.Frame(self)
         self.main_frame.pack(fill="both", expand=True, padx=10, pady=10)
-        
-        # Action buttons
-        self.buttons_frame = ttk.Frame(self)
-        self.buttons_frame.pack(fill="x", pady=10)
-        
-        self.back_button = ttk.Button(
-            self.buttons_frame,
-            text="Back to Main Menu",
-            command=self.go_to_main_menu,
-        )
-        self.back_button.pack(side="left", padx=10)
-        
+
         # Playlists management section
         self.playlists_section = ttk.Frame(self.main_frame)
         self.playlists_section.pack(fill="both", expand=True, pady=10)
 
-        # --- Add/Edit Playlist Form Block (outside the playlists_frame, above the list) ---
-        self.form_frame = ttk.Frame(self.playlists_section)
-        self.form_frame.pack(fill="x", padx=5, pady=(0, 2))
-        self.form_frame.grid_columnconfigure(1, weight=1)
-        self.form_frame.grid_columnconfigure(2, weight=0)
-
-        # Campo URL (solo visible en modo agregar)
-        self.url_label = ttk.Label(self.form_frame, text="URL:")
-        self.url_label.grid(row=0, column=0, sticky="w", padx=2, pady=2)
-        self.url_entry = ttk.Entry(self.form_frame)
-        self.url_entry.grid(row=0, column=1, sticky="ew", padx=2, pady=2)
-        self.extract_button = ttk.Button(
-            self.form_frame,
-            text="Extraer datos desde url",
-            command=self.extract_data_from_url
-        )
-        self.extract_button.grid(row=0, column=2, sticky="w", padx=2, pady=2)
-
-        ttk.Label(self.form_frame, text="ID:").grid(row=1, column=0, sticky="w", padx=2, pady=2)
-        self.id_entry = ttk.Entry(self.form_frame)
-        self.id_entry.grid(row=1, column=1, sticky="ew", padx=2, pady=2)
-
-        ttk.Label(self.form_frame, text="Nombre:").grid(row=2, column=0, sticky="w", padx=2, pady=2)
-        self.name_entry = ttk.Entry(self.form_frame)
-        self.name_entry.grid(row=2, column=1, sticky="ew", padx=2, pady=2)
-
-        self.form_buttons_frame = ttk.Frame(self.form_frame)
-        self.form_buttons_frame.grid(row=3, column=0, columnspan=2, sticky="e", pady=(5, 2))
-        self.save_button = ttk.Button(self.form_buttons_frame, text="Guardar", command=self.save_new_playlist)
-        self.save_button.pack(side="left", padx=2)
-        self.cancel_button = ttk.Button(self.form_buttons_frame, text="Cancelar", command=self.hide_add_form)
-        self.cancel_button.pack(side="left", padx=2)
-
-        self.form_frame.pack_forget()
-        self.form_placeholder = tk.Frame(self.playlists_section, height=10)  # Espacio mínimo
-        self.form_placeholder.pack(fill="x", padx=5, pady=(0, 2))
-
-        # Playlists LabelFrame (debajo del formulario)
+        # Playlists LabelFrame (debajo del botón y arriba del formulario)
         self.playlists_frame = ttk.LabelFrame(self.playlists_section, text="Current Playlists")
         self.playlists_frame.pack(fill="both", expand=True, pady=0)
 
         # Toolbar with add button
         self.toolbar_frame = ttk.Frame(self.playlists_frame)
         self.toolbar_frame.pack(fill="x", padx=5, pady=5)
-        
+
         self.add_button = ttk.Button(
             self.toolbar_frame, 
             text="+ Add Playlist", 
             command=self.add_playlist
         )
         self.add_button.pack(side="left", padx=5)
-        
+
         # Playlists treeview
         self.playlists_tree = ttk.Treeview(
             self.playlists_frame,
@@ -118,11 +70,62 @@ class ManagePlaylistsView(BaseView):
         # Bind actions to edit and delete buttons
         self.playlists_tree.bind("<Double-1>", self.on_item_double_click)
 
-       
-        # Log frame
-        self.log_frame = ttk.Frame(self.main_frame)
-        self.log_frame.pack(fill="both", expand=True, pady=10)
-        
+        # --- Bottom controls: Add/Edit Playlist Form (siempre visible) ---
+        self.bottom_controls_frame = ttk.Frame(self.playlists_section)
+        self.bottom_controls_frame.pack(fill="x", padx=5, pady=(10, 2))
+
+        # Contenedor principal del formulario (siempre visible, en columna)
+        self.form_frame = ttk.Frame(self.bottom_controls_frame)
+        self.form_frame.pack(fill="x", expand=True)
+
+        # Contenedor para los campos del formulario (en columna)
+        self.form_fields_frame = ttk.Frame(self.form_frame)
+        self.form_fields_frame.pack(fill="x", side="top", expand=True)
+        self.form_fields_frame.grid_columnconfigure(1, weight=1)
+        self.form_fields_frame.grid_columnconfigure(2, weight=0)
+
+        self.url_label = ttk.Label(self.form_fields_frame, text="URL:")
+        self.url_label.grid(row=0, column=0, sticky="w", padx=2, pady=2)
+        self.url_entry = ttk.Entry(self.form_fields_frame)
+        self.url_entry.grid(row=0, column=1, sticky="ew", padx=2, pady=2)
+        self.extract_button = ttk.Button(
+            self.form_fields_frame,
+            text="Extraer datos desde url",
+            command=self.extract_data_from_url
+        )
+        self.extract_button.grid(row=0, column=2, sticky="w", padx=2, pady=2)
+
+        ttk.Label(self.form_fields_frame, text="ID:").grid(row=1, column=0, sticky="w", padx=2, pady=2)
+        self.id_entry = ttk.Entry(self.form_fields_frame)
+        self.id_entry.grid(row=1, column=1, sticky="ew", padx=2, pady=2)
+
+        ttk.Label(self.form_fields_frame, text="Nombre:").grid(row=2, column=0, sticky="w", padx=2, pady=2)
+        self.name_entry = ttk.Entry(self.form_fields_frame)
+        self.name_entry.grid(row=2, column=1, sticky="ew", padx=2, pady=2)
+
+        # Contenedor para los botones (horizontal: volver | guardar/cancelar)
+        self.form_actions_frame = ttk.Frame(self.form_frame)
+        # No empacar aquí, se hace dinámicamente en show/hide
+
+        self.back_button = ttk.Button(self.form_actions_frame, text="Back to Main Menu", command=self.go_to_main_menu)
+        self.back_button.pack(side="left", padx=2)
+
+        self.form_buttons_inner_frame = ttk.Frame(self.form_actions_frame)
+        self.form_buttons_inner_frame.pack(side="left", padx=10)
+
+        self.save_button = ttk.Button(self.form_buttons_inner_frame, text="Guardar", command=self.save_new_playlist)
+        self.save_button.pack(side="left", padx=2)
+        self.cancel_button = ttk.Button(self.form_buttons_inner_frame, text="Cancelar", command=self.hide_add_form)
+        self.cancel_button.pack(side="left", padx=2)
+
+        # El botón de volver SIEMPRE visible debajo del formulario
+        self.back_button_alone = ttk.Button(self.form_frame, text="Back to Main Menu", command=self.go_to_main_menu)
+        self.back_button_alone.pack(side="left", padx=2)
+
+        # El formulario inicia oculto (solo oculta campos y botones guardar/cancelar, pero NO el botón volver solo)
+        self.form_fields_frame.pack_forget()
+        self.form_actions_frame.pack_forget()
+
     def go_to_main_menu(self):
         """Go back to main menu"""
         self.trigger_event("navigate_to", "main_menu")
@@ -144,29 +147,32 @@ class ManagePlaylistsView(BaseView):
     def show_add_form(self):
         """Muestra el formulario para agregar playlist (modo agregar)"""
         self._edit_mode = False
-        self.form_placeholder.pack_forget()
-        self.form_frame.pack(fill="x", padx=5, pady=(0, 2))
+        self.form_fields_frame.pack(fill="x", expand=True)
+        self.form_actions_frame.pack(fill="x", pady=(5, 2))
+        self.form_buttons_inner_frame.pack(side="left", padx=10)
+        self.back_button_alone.pack_forget()  # Oculta el botón solo
         self.url_entry.delete(0, tk.END)
         self.id_entry.delete(0, tk.END)
         self.name_entry.delete(0, tk.END)
-        # Botón guardar llama a save_new_playlist
         self.save_button.config(text="Guardar", command=self.save_new_playlist)
 
     def hide_add_form(self):
-        """Oculta el formulario y muestra el placeholder"""
-        self.form_frame.pack_forget()
-        self.form_placeholder.pack(fill="x", padx=5, pady=(0, 2))
+        """Oculta los campos y botones guardar/cancelar, muestra solo el botón volver"""
+        self.form_fields_frame.pack_forget()
+        self.form_actions_frame.pack_forget()
+        self.back_button_alone.pack(fill="x", pady=(5, 2))
 
     def show_edit_form(self, playlist_id, name):
         """Muestra el formulario para editar playlist (modo edición)"""
         self._edit_mode = True
-        self.form_placeholder.pack_forget()
-        self.form_frame.pack(fill="x", padx=5, pady=(0, 2))
+        self.form_fields_frame.pack(fill="x", expand=True)
+        self.form_actions_frame.pack(fill="x", pady=(5, 2))
+        self.form_buttons_inner_frame.pack(side="left", padx=10)
+        self.back_button_alone.pack_forget()  # Oculta el botón solo
         self.id_entry.delete(0, tk.END)
         self.id_entry.insert(0, playlist_id)
         self.name_entry.delete(0, tk.END)
         self.name_entry.insert(0, name)
-        # Botón guardar llama a update_playlist
         self.save_button.config(text="Guardar cambios", command=self.update_playlist)
         self._editing_item_id = playlist_id
 
@@ -217,7 +223,7 @@ class ManagePlaylistsView(BaseView):
     def on_item_double_click(self, event):
         """Handle double click on tree item"""
         region = self.playlists_tree.identify("region", event.x, event.y)
-        if region == "cell":
+        if (region == "cell"):
             column = self.playlists_tree.identify_column(event.x)
             item = self.playlists_tree.identify_row(event.y)
             
