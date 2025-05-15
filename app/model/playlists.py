@@ -18,7 +18,7 @@ class Playlists:
             CREATE TABLE IF NOT EXISTS playlists (
             playlist_id TEXT PRIMARY KEY,
             name TEXT NOT NULL,
-            genre TEXT
+           
             )
             """
         )
