@@ -23,6 +23,7 @@ class ManagePlaylistsController(BaseController):
         self.view.register_event_handler("extract_data_from_url", self.extract_data_from_url)
         self.view.register_event_handler("save_new_playlist", self.save_new_playlist)
         self.view.register_event_handler("update_playlist", self.update_playlist)
+        self.view.register_event_handler("delete_playlist", self.delete_playlist)
     def handle_navigation(self, view_name):
         """Handle navigation events from the view"""
         self.navigate_to(view_name)
@@ -68,3 +69,10 @@ class ManagePlaylistsController(BaseController):
         print(f"Updating playlist: {id}, {name}")
         Playlists.update_playlist(playlist= playlist,playlist_id= playlist_id, name = name)
         self.update_view()  
+        
+    def delete_playlist(self, playlist_id):
+        """delete a playlist from the database."""
+        print(f"Deleting playlist: {playlist_id}")
+        Playlists.delete_playlist(playlist_id)
+        self.update_view()
+        

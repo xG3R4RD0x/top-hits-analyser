@@ -120,6 +120,30 @@ class ManagePlaylistsView(BaseView):
         self.cancel_button = ttk.Button(self.form_buttons_inner_frame, text="Cancelar", command=self.hide_add_form)
         self.cancel_button.pack(side="left", padx=2)
 
+        # --- Contenedor de confirmación de borrado (inicialmente oculto) ---
+        self.delete_confirm_frame = ttk.Frame(self.form_frame)
+        self.delete_confirm_label = ttk.Label(
+            self.delete_confirm_frame,
+            text="¿Seguro quieres borrar esta playlist?",
+            foreground="red"
+        )
+        self.delete_confirm_label.pack(side="top", pady=5, padx=5)
+        self.delete_confirm_buttons = ttk.Frame(self.delete_confirm_frame)
+        self.delete_confirm_buttons.pack(side="top", pady=2)
+        self.delete_confirm_yes = ttk.Button(
+            self.delete_confirm_buttons,
+            text="Seguir",
+            command=self.confirm_delete_playlist
+        )
+        self.delete_confirm_yes.pack(side="left", padx=5)
+        self.delete_confirm_cancel = ttk.Button(
+            self.delete_confirm_buttons,
+            text="Cancelar",
+            command=self.hide_delete_confirm
+        )
+        self.delete_confirm_cancel.pack(side="left", padx=5)
+        self.delete_confirm_frame.pack_forget()
+
         # El botón de volver SIEMPRE visible debajo del formulario
         self.back_button_alone = ttk.Button(self.form_frame, text="Back to Main Menu", command=self.go_to_main_menu)
         self.back_button_alone.pack(side="left", padx=2)
@@ -127,6 +151,7 @@ class ManagePlaylistsView(BaseView):
         # El formulario inicia oculto (solo oculta campos y botones guardar/cancelar, pero NO el botón volver solo)
         self.form_fields_frame.pack_forget()
         self.form_actions_frame.pack_forget()
+        self.delete_confirm_frame.pack_forget()
 
     def go_to_main_menu(self):
         """Go back to main menu"""
@@ -222,10 +247,27 @@ class ManagePlaylistsView(BaseView):
 
     def delete_playlist(self, item_id):
         """Handler for delete playlist action"""
-        # This will be connected to controller later
-        playlist_name = self.playlists_tree.item(item_id)['values'][0]
-        print(f"Delete playlist: {playlist_name}")
+        # Mostrar confirmación de borrado
+              
+        values = self.playlists_tree.item(item_id)['values']
+        playlist = Playlists.get_playlist_by_name(values[0])  
+        self._delete_item_id = playlist.playlist_id
         
+        self.form_fields_frame.pack_forget()
+        self.form_actions_frame.pack_forget()
+        self.delete_confirm_frame.pack(fill="x", pady=10)
+
+    def hide_delete_confirm(self):
+        """Oculta el contenedor de confirmación de borrado y muestra el botón volver"""
+        self.delete_confirm_frame.pack_forget()
+        
+
+    def confirm_delete_playlist(self):
+        """Confirma el borrado de la playlist"""
+        
+        self.trigger_event("delete_playlist", self._delete_item_id)
+        self.delete_confirm_frame.pack_forget()
+
     def on_item_double_click(self, event):
         """Handle double click on tree item"""
         region = self.playlists_tree.identify("region", event.x, event.y)
