@@ -46,7 +46,7 @@ class Playlists:
             INSERT INTO playlists (playlist_id, name)
             VALUES (?, ?)
             """,
-            obj.to_tuple(),
+            (obj.playlist_id, obj.name),    
         )
         DB_CONNECTION.commit()
 

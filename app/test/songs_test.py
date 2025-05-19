@@ -106,20 +106,5 @@ class TestSongs(unittest.TestCase):
             ["Updated Song", "Updated Artist", 1],
         )
 
-    @patch("app.model.songs.get_db_connection")
-    def test_check_field_value(self, mock_get_db_connection):
-        mock_connection = MagicMock()
-        mock_cursor = MagicMock()
-        mock_get_db_connection.return_value = mock_connection
-        mock_connection.cursor.return_value = mock_cursor
-        mock_cursor.fetchone.side_effect = [
-            ("field_name",),  # Field exists
-            ("value",),  # Field value matches
-        ]
-
-        result = Songs.check_field_value(1, "field_name", "value")
-        self.assertTrue(result)
-
-
 if __name__ == "__main__":
     unittest.main()

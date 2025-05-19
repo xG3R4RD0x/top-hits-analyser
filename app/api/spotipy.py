@@ -34,7 +34,7 @@ class SpotifyAPIHandler:
         tracks = []
         print(str(limit))
         try:
-            print(f"Fetching tracks from playlist: {playlist_id}")
+            print(f"Fetching tracks from playlist: {playlist_name}")
             results = self.sp.playlist_items(
                 playlist_id,
                 limit=limit,

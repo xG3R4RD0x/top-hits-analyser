@@ -38,10 +38,10 @@ class UpdateDBController(BaseController):
 
         self.view.add_log_message("Updating songs from playlists...")
         for playlist in playlists:
-            self.view.add_log_message(f"Fetching songs from playlist: {playlist[0]}")
-            print(playlist)
+            self.view.add_log_message(f"Fetching songs from playlist: {playlist.name}")
+            print(playlist.name)
             playlist_songs_list = self.fetch_songs_from_playlist(
-                playlist[1], playlist[0]
+                playlist.playlist_id, playlist.name
             )
             if len(playlist_songs_list) == 0:
                 continue
@@ -54,7 +54,7 @@ class UpdateDBController(BaseController):
                 Songs.add_song(song)
 
             self.view.add_log_message(
-                f"Songs from playlist {playlist[0]} successfully added."
+                f"Songs from playlist {playlist.name} successfully added."
             )
             update_porcentage += update_porcentage_step
             self.view.update_progress(update_porcentage)
@@ -71,15 +71,9 @@ class UpdateDBController(BaseController):
             return ()
         else:
             self.view.add_log_message(f"Found {len(playlists)} playlists:")
-            playlist_list = []
-            # Display each playlist in the log messages and collect tuples
-            for playlist in playlists:
-                playlist_info = (
-                    f"Playlist: {playlist.name} (ID: {playlist.playlist_id})"
-                )
-                
-            self.view.add_log_message("Playlist information loaded successfully.")
-            return playlist_list
+
+            
+        return playlists
 
     def fetch_songs_from_playlist(self, playlist_id, playlist_name):
         """Fetch songs from a specific playlist and return them as a list of Song objects."""
