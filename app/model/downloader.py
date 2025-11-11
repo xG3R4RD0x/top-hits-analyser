@@ -1,6 +1,7 @@
 from yt_dlp import YoutubeDL
 import os
 from app.model.song import Song
+from app.model.songs import Songs
 
 
 class Downloader:
@@ -75,5 +76,18 @@ class Downloader:
             with YoutubeDL(ydl_opts) as ydl:
                 print(f"Downloading audio for: {video_title}")
                 ydl.download([video_url])
+                Downloader.check_if_exists(song)
+
         except Exception as e:
             print(f"Error downloading audio for {video_title}: {e}")
+
+    def check_if_exists(song: Song):
+        """Check if the song file already exists in the output path."""
+        output_path = "music/hits"
+        video_title = Downloader.build_song_title(song)
+        output_file = os.path.join(output_path, f"{video_title}.mp3")
+
+        if os.path.exists(output_file):
+            Songs.mark_as_downloaded(song.id)
+            return True
+        return False

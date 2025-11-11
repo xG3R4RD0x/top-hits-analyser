@@ -15,9 +15,10 @@ def create_database(db_path):
             album TEXT,
             release_date TEXT,
             youtube_url TEXT,
+            downloaded BOOLEAN,
             UNIQUE(artist, name)
         )
-    """
+        """
     )
 
     conn.commit()

@@ -72,7 +72,6 @@ class UpdateDBController(BaseController):
         else:
             self.view.add_log_message(f"Found {len(playlists)} playlists:")
 
-            
         return playlists
 
     def fetch_songs_from_playlist(self, playlist_id, playlist_name):
@@ -209,3 +208,37 @@ class UpdateDBController(BaseController):
         self.view.cancelled = True
         self.stop_update = True
         self.view.complete_operation(False)
+
+    def check_downloaded_songs(self):
+        """Itera por las canciones y comprueba si están descargadas usando Downloader.check_if_exists."""
+        self.view.add_log_message("Comprobando existencia de canciones descargadas...")
+        songs = Songs.list_songs()
+        if not songs:
+            self.view.add_log_message("No hay canciones en la base de datos.")
+            return
+
+        total_songs = len(songs)
+        update_percentage_step = 100 / total_songs
+        update_percentage = 0
+
+        for song in songs:
+            if self.stop_update:
+                self.view.add_log_message("Operación cancelada.")
+                break
+
+            try:
+                exists = Downloader.check_if_exists(song)
+            except Exception as e:
+                self.view.add_log_message(f"Error comprobando '{song.name}': {e}")
+                continue
+
+            if exists:
+                self.view.add_log_message(f"'{song.name}' está en carpeta.")
+            else:
+                self.view.add_log_message(f"'{song.name}' no está descargada.")
+
+            # Actualizar la barra de progreso
+            update_percentage += update_percentage_step
+            self.view.update_progress(update_percentage)
+
+        self.view.add_log_message("Comprobación de existencia finalizada.")

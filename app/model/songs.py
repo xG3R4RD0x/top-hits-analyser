@@ -23,6 +23,8 @@ class Songs:
             artist TEXT NOT NULL,
             album TEXT,
             youtube_url TEXT,
+            downloaded BOOLEAN,
+            UNIQUE(artist, name),
             FOREIGN KEY (playlist_id) REFERENCES playlists(id)
             )
             """
@@ -194,3 +196,18 @@ class Songs:
 
         # If value is provided, check if it matches the field value
         return result[0] == value if value is not None else True
+
+    @staticmethod
+    def mark_as_downloaded(song_id):
+        """Mark a song as downloaded by setting the downloaded field to True."""
+        DB_CONNECTION = get_db_connection()
+        cursor = DB_CONNECTION.cursor()
+        cursor.execute(
+            """
+            UPDATE songs
+            SET downloaded = 1
+            WHERE id = ?
+            """,
+            (song_id,),
+        )
+        DB_CONNECTION.commit()
