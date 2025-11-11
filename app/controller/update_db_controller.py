@@ -150,6 +150,10 @@ class UpdateDBController(BaseController):
     def download_songs(self):
         """Download songs from the database using multithreading without blocking the GUI."""
 
+        self.view.add_log_message("Preparing to download songs from the database...")
+        self.check_downloaded_songs()
+        self.view.update_progress(0)
+
         def process_song(song, lock):
             """Download a single song."""
             if self.stop_update:
@@ -167,9 +171,9 @@ class UpdateDBController(BaseController):
         def background_task():
             """Background task to download songs."""
             self.view.add_log_message("Downloading songs...")
-            songs = Songs.list_songs()
+            songs = Songs.list_not_downloaded_songs()
             if not songs:
-                self.view.add_log_message("No songs found in the database.")
+                self.view.add_log_message("No songs remaining for download.")
                 self.stop_update = True
                 self.view.complete_operation(False)
                 return

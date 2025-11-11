@@ -90,4 +90,6 @@ class Downloader:
         if os.path.exists(output_file):
             Songs.mark_as_downloaded(song.id)
             return True
-        return False
+        else:
+            Songs.mark_as_not_downloaded(song.id)
+            return False
