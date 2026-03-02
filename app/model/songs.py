@@ -23,6 +23,8 @@ class Songs:
             artist TEXT NOT NULL,
             album TEXT,
             youtube_url TEXT,
+            downloaded BOOLEAN,
+            UNIQUE(artist, name),
             FOREIGN KEY (playlist_id) REFERENCES playlists(id)
             )
             """
@@ -175,6 +177,27 @@ class Songs:
         ]
 
     @staticmethod
+    def list_not_downloaded_songs():
+        """Retrieve all songs that have not been downloaded yet."""
+        DB_CONNECTION = get_db_connection()
+        cursor = DB_CONNECTION.cursor()
+        cursor.execute("SELECT * FROM songs WHERE downloaded IS NULL OR downloaded = 0")
+        rows = cursor.fetchall()
+        return [
+            Song(
+                id=row[0],
+                name=row[1],
+                playlist_name=row[2],
+                playlist_id=row[3],
+                release_date=row[4],
+                artist=row[5],
+                album=row[6],
+                youtube_url=row[7],
+            )
+            for row in rows
+        ]
+
+    @staticmethod
     def check_field_value(song_id, field_name, value=None):
         """Check if a specific field exists for a song in the database and optionally matches the given value."""
         DB_CONNECTION = get_db_connection()
@@ -194,3 +217,33 @@ class Songs:
 
         # If value is provided, check if it matches the field value
         return result[0] == value if value is not None else True
+
+    @staticmethod
+    def mark_as_downloaded(song_id):
+        """Mark a song as downloaded by setting the downloaded field to True."""
+        DB_CONNECTION = get_db_connection()
+        cursor = DB_CONNECTION.cursor()
+        cursor.execute(
+            """
+            UPDATE songs
+            SET downloaded = True
+            WHERE id = ?
+            """,
+            (song_id,),
+        )
+        DB_CONNECTION.commit()
+
+    @staticmethod
+    def mark_as_not_downloaded(song_id):
+        """Mark a song as NOT downloaded by setting the downloaded field to False."""
+        DB_CONNECTION = get_db_connection()
+        cursor = DB_CONNECTION.cursor()
+        cursor.execute(
+            """
+            UPDATE songs
+            SET downloaded = False
+            WHERE id = ?
+            """,
+            (song_id,),
+        )
+        DB_CONNECTION.commit()
