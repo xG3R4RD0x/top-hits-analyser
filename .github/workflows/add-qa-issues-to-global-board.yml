@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Add issue to Global QA board when labeled qa
         if: contains(github.event.issue.labels.*.name, 'qa')
-        uses: actions/add-to-project@v1
+        uses: actions/add-to-project@main
         with:
           project-url: https://github.com/users/xG3R4RD0x/projects/4
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
