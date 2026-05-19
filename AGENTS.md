@@ -185,3 +185,17 @@ def test_list_songs_from_playlist(self, mock_get_db_connection):
 2. Use `unittest.TestCase`
 3. Mock external dependencies
 4. Run tests to verify
+
+## Agent skills
+
+### Issue tracker
+
+Issues are tracked in GitHub Issues. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Label vocabulary matches the canonical names (needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context layout. See `docs/agents/domain.md`.
