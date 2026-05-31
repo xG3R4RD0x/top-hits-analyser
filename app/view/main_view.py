@@ -16,40 +16,110 @@ class MainView:
     def __init__(self, root):
         self.root = root
         self.root.title("Hits Downloader")
-        self.root.geometry("800x600")
+        self.root.geometry("900x650")
 
-        # Configurar el estilo
         self.style = ttk.Style()
         self.style.configure("TFrame", background="#f0f0f0")
+        self.style.configure("Sidebar.TFrame", background="#2c3e50")
         self.style.configure(
             "Header.TLabel", font=("Helvetica", 16, "bold"), background="#f0f0f0"
         )
+        
+        # Tab styling
+        self.style.configure("Tab.TButton", font=("Helvetica", 10), padding=(15, 12))
+        self.style.map("Tab.TButton",
+            background=[("active", "#34495e"), ("pressed", "#34495e")],
+            foreground=[("active", "white"), ("pressed", "white")]
+        )
+        self.style.configure("TabActive.TButton", font=("Helvetica", 10, "bold"), padding=(15, 12), background="#3498db", foreground="white")
+        self.style.map("TabActive.TButton",
+            background=[("active", "#2980b9"), ("pressed", "#2980b9")]
+        )
 
-        # Crear el contenedor principal
         self.main_container = ttk.Frame(self.root, style="TFrame")
         self.main_container.pack(side="top", fill="both", expand=True)
 
-        # Crear el header que será consistente en todas las vistas
+        self.create_sidebar()
+        self.create_header()
+        self.create_content_area()
+
+        self.frames = {}
+        self.controller = None
+
+    def set_controller(self, controller):
+        self.controller = controller
+
+    def create_sidebar(self):
+        self.sidebar = ttk.Frame(self.main_container, style="Sidebar.TFrame", width=220)
+        self.sidebar.pack(side="left", fill="y", padx=0, pady=0)
+        self.sidebar.pack_propagate(False)
+
+        # Logo section
+        logo_frame = ttk.Frame(self.sidebar, style="Sidebar.TFrame")
+        logo_frame.pack(fill="x", padx=0, pady=0)
+        
+        self.logo_label = ttk.Label(
+            logo_frame, 
+            text="Hits Downloader", 
+            font=("Helvetica", 12, "bold"),
+            background="#1a252f",
+            foreground="white",
+            padding=12
+        )
+        self.logo_label.pack(fill="x", pady=0)
+
+        # Navigation tabs section
+        self.nav_frame = ttk.Frame(self.sidebar, style="Sidebar.TFrame")
+        self.nav_frame.pack(fill="both", expand=True, padx=0, pady=10)
+
+        self.nav_buttons = {}
+        
+        nav_items = [
+            ("update_db_view", "Download & Fetch"),
+            ("database_view", "Check Database"),
+            ("manage_playlists_view", "Manage Playlists"),
+        ]
+        
+        for view_id, text in nav_items:
+            btn = ttk.Button(
+                self.nav_frame,
+                text=text,
+                style="Tab.TButton",
+                command=lambda v=view_id: self.navigate_callback(v)
+            )
+            btn.pack(fill="x", padx=8, pady=5)
+            self.nav_buttons[view_id] = btn
+
+        self.current_view = "update_db_view"
+        self.update_nav_buttons()
+
+    def navigate_callback(self, view_name):
+        self.current_view = view_name
+        self.update_nav_buttons()
+        if self.controller:
+            self.controller.navigate_to(view_name)
+
+    def update_nav_buttons(self):
+        for view_id, btn in self.nav_buttons.items():
+            if view_id == self.current_view:
+                btn.config(style="TabActive.TButton")
+            else:
+                btn.config(style="Tab.TButton")
+
+    def create_header(self):
         self.header = ttk.Frame(self.main_container, style="TFrame")
-        self.header.pack(side="top", fill="x", padx=10, pady=10)
+        self.header.pack(side="top", fill="x", padx=20, pady=15)
 
         self.title_label = ttk.Label(
-            self.header, text="Hits Downloader", style="Header.TLabel"
+            self.header, text="Menú Principal", style="Header.TLabel"
         )
         self.title_label.pack(side="left", padx=10)
 
-        # Crear el contenedor para las vistas (frames) que irán cambiando
+    def create_content_area(self):
         self.content_container = ttk.Frame(self.main_container, style="TFrame")
         self.content_container.pack(
-            side="top", fill="both", expand=True, padx=10, pady=10
+            side="top", fill="both", expand=True, padx=20, pady=(0, 15)
         )
-
-        # Crear el footer para navegación y controles comunes
-        self.footer = ttk.Frame(self.main_container, style="TFrame")
-        self.footer.pack(side="bottom", fill="x", padx=10, pady=10)
-
-        # Diccionario para almacenar todas las vistas/frames
-        self.frames = {}
 
     def add_frame(self, frame_class, frame_name, *args, **kwargs):
         """
@@ -73,21 +143,31 @@ class MainView:
         Args:
             frame_name: Nombre/identificador del frame a mostrar
         """
-        # Verificar si el frame existe
         if frame_name not in self.frames:
             print(
                 f"Error: No se puede mostrar el frame '{frame_name}' porque no existe."
             )
             return
 
-        # Ocultar todos los frames
         for frame in self.frames.values():
             frame.pack_forget()
 
-        # Mostrar el frame solicitado
         frame = self.frames[frame_name]
         frame.pack(fill="both", expand=True)
+        
+        self.current_view = frame_name
+        self.update_nav_buttons()
+        self.update_title(frame_name)
         return frame
+
+    def update_title(self, view_name):
+        titles = {
+            "main_menu": "Menú Principal",
+            "update_db_view": "Download & Fetch Songs",
+            "database_view": "Check Songs in Database",
+            "manage_playlists_view": "Manage Playlists",
+        }
+        self.title_label.config(text=titles.get(view_name, "Hits Downloader"))
 
 
 if __name__ == "__main__":

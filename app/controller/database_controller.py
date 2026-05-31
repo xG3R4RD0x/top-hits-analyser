@@ -14,6 +14,10 @@ class DatabaseController(BaseController):
         """Handle navigation events from the view"""
         self.navigate_to(view_name)
 
+    def update_view(self):
+        """Automatically load all songs when view is displayed"""
+        self.fetch_all_songs()
+
     def fetch_all_songs(self):
         """Update the data displayed in the database view."""
         print("DatabaseController: Updating displayed data...")

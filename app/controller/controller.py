@@ -14,14 +14,11 @@ from app.controller.manage_playlists_controller import ManagePlaylistsController
 
 class MainController:
     def __init__(self, root):
-        # Initialize main view
         self.view = MainView(root)
-
-        # Create all frames/views needed for the application
+        self.view.set_controller(self)
+        
         self.init_frames()
-
-        # Show the initial view (main menu)
-        self.navigate_to("main_menu")
+        self.navigate_to("update_db_view")
 
     def init_frames(self):
         """Initialize all frames/views of the application and add them to the view manager."""
@@ -49,13 +46,10 @@ class MainController:
         Args:
             view_name: The name of the view to display.
         """
-        
-        # Show the frame and get a reference to it
         frame = self.view.show_frame(view_name)
         
-        
-        # Update current_view
-        frame.update()
+        if frame and hasattr(frame, 'update'):
+            frame.update()
         return frame
 
 

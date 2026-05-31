@@ -1,3 +1,4 @@
+import sqlite3
 from app.model.db_config import get_db_connection
 from app.model.song import Song
 
@@ -24,6 +25,7 @@ class Songs:
             album TEXT,
             youtube_url TEXT,
             downloaded BOOLEAN,
+            in_playlist BOOLEAN DEFAULT 0,
             UNIQUE(artist, name),
             FOREIGN KEY (playlist_id) REFERENCES playlists(id)
             )
@@ -36,18 +38,21 @@ class Songs:
         """Retrieve all songs from a specific playlist as Song objects."""
         DB_CONNECTION = get_db_connection()
         cursor = DB_CONNECTION.cursor()
+        cursor.row_factory = sqlite3.Row  # Use column names
         cursor.execute("SELECT * FROM songs WHERE playlist_id = ?", (playlist_id,))
         rows = cursor.fetchall()
         return [
             Song(
-                id=row[0],
-                name=row[1],
-                playlist_name=row[2],
-                playlist_id=row[3],
-                release_date=row[4],
-                artist=row[5],
-                album=row[6],
-                youtube_url=row[7],
+                id=row["id"],
+                name=row["name"],
+                playlist_name=row["playlist_name"],
+                playlist_id=row["playlist_id"],
+                release_date=row["release_date"],
+                artist=row["artist"],
+                album=row["album"],
+                youtube_url=row["youtube_url"],
+                downloaded=row["downloaded"],
+                in_playlist=row["in_playlist"],
             )
             for row in rows
         ]
@@ -73,8 +78,8 @@ class Songs:
         # Add the song if it doesn't exist
         cursor.execute(
             """
-            INSERT INTO songs (name, playlist_name, playlist_id, release_date, artist, album, youtube_url)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO songs (name, playlist_name, playlist_id, release_date, artist, album, youtube_url, in_playlist)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 song.name,
@@ -84,6 +89,7 @@ class Songs:
                 song.artist,
                 song.album,
                 song.youtube_url,
+                1,  # in_playlist = True by default when adding from update
             ),
         )
         DB_CONNECTION.commit()
@@ -93,18 +99,21 @@ class Songs:
         """Retrieve a song by its ID."""
         DB_CONNECTION = get_db_connection()
         cursor = DB_CONNECTION.cursor()
+        cursor.row_factory = sqlite3.Row
         cursor.execute("SELECT * FROM songs WHERE id = ?", (song_id,))
         row = cursor.fetchone()
         if row:
             return Song(
-                id=row[0],
-                name=row[1],
-                playlist_name=row[2],
-                playlist_id=row[3],
-                release_date=row[4],
-                artist=row[5],
-                album=row[6],
-                youtube_url=row[7],
+                id=row["id"],
+                name=row["name"],
+                playlist_name=row["playlist_name"],
+                playlist_id=row["playlist_id"],
+                release_date=row["release_date"],
+                artist=row["artist"],
+                album=row["album"],
+                youtube_url=row["youtube_url"],
+                downloaded=row["downloaded"],
+                in_playlist=row["in_playlist"],
             )
         return None
 
@@ -131,6 +140,7 @@ class Songs:
             "artist",
             "album",
             "youtube_url",
+            "in_playlist",
         }
 
         # Validate that all keys in updates are allowed
@@ -160,18 +170,21 @@ class Songs:
         """Retrieve all songs as Song objects."""
         DB_CONNECTION = get_db_connection()
         cursor = DB_CONNECTION.cursor()
+        cursor.row_factory = sqlite3.Row
         cursor.execute("SELECT * FROM songs")
         rows = cursor.fetchall()
         return [
             Song(
-                id=row[0],
-                name=row[1],
-                playlist_name=row[2],
-                playlist_id=row[3],
-                release_date=row[4],
-                artist=row[5],
-                album=row[6],
-                youtube_url=row[7],
+                id=row["id"],
+                name=row["name"],
+                playlist_name=row["playlist_name"],
+                playlist_id=row["playlist_id"],
+                release_date=row["release_date"],
+                artist=row["artist"],
+                album=row["album"],
+                youtube_url=row["youtube_url"],
+                downloaded=row["downloaded"],
+                in_playlist=row["in_playlist"],
             )
             for row in rows
         ]
@@ -181,18 +194,21 @@ class Songs:
         """Retrieve all songs that have not been downloaded yet."""
         DB_CONNECTION = get_db_connection()
         cursor = DB_CONNECTION.cursor()
+        cursor.row_factory = sqlite3.Row
         cursor.execute("SELECT * FROM songs WHERE downloaded IS NULL OR downloaded = 0")
         rows = cursor.fetchall()
         return [
             Song(
-                id=row[0],
-                name=row[1],
-                playlist_name=row[2],
-                playlist_id=row[3],
-                release_date=row[4],
-                artist=row[5],
-                album=row[6],
-                youtube_url=row[7],
+                id=row["id"],
+                name=row["name"],
+                playlist_name=row["playlist_name"],
+                playlist_id=row["playlist_id"],
+                release_date=row["release_date"],
+                artist=row["artist"],
+                album=row["album"],
+                youtube_url=row["youtube_url"],
+                downloaded=row["downloaded"],
+                in_playlist=row["in_playlist"],
             )
             for row in rows
         ]
@@ -246,4 +262,51 @@ class Songs:
             """,
             (song_id,),
         )
+        DB_CONNECTION.commit()
+
+    @staticmethod
+    def mark_songs_active_in_playlist(playlist_id):
+        """Mark all songs in a playlist as in_playlist = True"""
+        DB_CONNECTION = get_db_connection()
+        cursor = DB_CONNECTION.cursor()
+        cursor.execute(
+            """
+            UPDATE songs
+            SET in_playlist = 1
+            WHERE playlist_id = ?
+            """,
+            (playlist_id,),
+        )
+        DB_CONNECTION.commit()
+
+    @staticmethod
+    def mark_songs_inactive_in_playlist(playlist_id, song_ids_to_keep):
+        """Mark songs NOT in the given list as in_playlist = False for a playlist"""
+        if not song_ids_to_keep:
+            # If no songs to keep, mark all as inactive
+            DB_CONNECTION = get_db_connection()
+            cursor = DB_CONNECTION.cursor()
+            cursor.execute(
+                """
+                UPDATE songs
+                SET in_playlist = 0
+                WHERE playlist_id = ?
+                """,
+                (playlist_id,),
+            )
+            DB_CONNECTION.commit()
+            return
+
+        DB_CONNECTION = get_db_connection()
+        cursor = DB_CONNECTION.cursor()
+        
+        # Mark songs not in the list as inactive
+        placeholders = ",".join("?" * len(song_ids_to_keep))
+        query = f"""
+            UPDATE songs
+            SET in_playlist = 0
+            WHERE playlist_id = ? AND id NOT IN ({placeholders})
+        """
+        params = [playlist_id] + song_ids_to_keep
+        cursor.execute(query, params)
         DB_CONNECTION.commit()

@@ -30,43 +30,34 @@ class UpdateDBView(BaseView):
     """View to display database update progress"""
 
     def setup_ui(self):
-        # View title
-        self.view_label = ttk.Label(
-            self, text="Database Update", font=("Helvetica", 14)
-        )
-        self.view_label.pack(pady=10)
-
         # Main container
         self.main_frame = ttk.Frame(self)
         self.main_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-        # Progress bar frame
-        self.progress_frame = ttk.Frame(self.main_frame)
-        self.progress_frame.pack(fill="x", pady=10)
+        # Progress bar section
+        self.progress_frame = ttk.LabelFrame(self.main_frame, text="Progress")
+        self.progress_frame.pack(fill="x", pady=(0, 10))
 
-        self.progress_label = ttk.Label(self.progress_frame, text="Progress:")
-        self.progress_label.pack(side="left", padx=5)
+        self.progress_label = ttk.Label(self.progress_frame, text="Status:")
+        self.progress_label.pack(side="left", padx=5, pady=5)
 
         self.progress_bar = ttk.Progressbar(
-            self.progress_frame, length=500, mode="determinate", orient="horizontal"
+            self.progress_frame, length=400, mode="determinate", orient="horizontal"
         )
-        self.progress_bar.pack(side="left", fill="x", expand=True, padx=5)
+        self.progress_bar.pack(side="left", fill="x", expand=True, padx=5, pady=5)
 
-        self.progress_percentage = ttk.Label(self.progress_frame, text="0%")
-        self.progress_percentage.pack(side="left", padx=5)
+        self.progress_percentage = ttk.Label(self.progress_frame, text="0%", font=("Helvetica", 10, "bold"))
+        self.progress_percentage.pack(side="left", padx=5, pady=5)
 
-        # Log frame
-        self.log_frame = ttk.Frame(self.main_frame)
-        self.log_frame.pack(fill="both", expand=True, pady=10)
-
-        self.log_label = ttk.Label(self.log_frame, text="Operations Log:")
-        self.log_label.pack(anchor="w")
+        # Operation Log section
+        self.log_frame = ttk.LabelFrame(self.main_frame, text="Operation Log")
+        self.log_frame.pack(fill="both", expand=True, pady=(0, 10))
 
         # Create a Text widget with scrollbar for the log
         self.log_text_frame = ttk.Frame(self.log_frame)
-        self.log_text_frame.pack(fill="both", expand=True)
+        self.log_text_frame.pack(fill="both", expand=True, padx=5, pady=5)
 
-        self.log_text = tk.Text(self.log_text_frame, wrap=tk.WORD, height=15)
+        self.log_text = tk.Text(self.log_text_frame, wrap=tk.WORD, height=12, font=("Courier", 9))
         self.log_text.pack(side="left", fill="both", expand=True)
 
         self.log_scrollbar = ttk.Scrollbar(
@@ -75,61 +66,42 @@ class UpdateDBView(BaseView):
         self.log_scrollbar.pack(side="right", fill="y")
 
         self.log_text.config(yscrollcommand=self.log_scrollbar.set)
-        self.log_text.configure(
-            state="disabled"
-        )  # Initially disabled to prevent editing
+        self.log_text.configure(state="disabled")
 
-        # Action buttons
-        self.buttons_frame = ttk.Frame(self)
-        self.buttons_frame.pack(fill="x", pady=10)
+        # Action buttons frame
+        self.buttons_frame = ttk.Frame(self.main_frame)
+        self.buttons_frame.pack(fill="x", pady=5)
 
-        self.back_button = ttk.Button(
+        # Operation buttons
+        self.update_button = ttk.Button(
             self.buttons_frame,
-            text="Back to Main Menu",
-            command=self.go_to_main_menu,
-        )
-        self.back_button.pack(side="left", padx=10)
-
-        self.start_update_button = ttk.Button(
-            self.buttons_frame,
-            text="Start Update",
+            text="Update Songs",
             command=self.start_operation,
         )
-        self.start_update_button.pack(side="left", padx=10)
+        self.update_button.pack(side="left", padx=5)
 
         self.fetch_songs_button = ttk.Button(
             self.buttons_frame,
-            text="Fetch Songs URLs",
+            text="Fetch URLs",
             command=self.fetch_songs_urls,
         )
-        self.fetch_songs_button.pack(side="left", padx=10)
-
-        self.check_downloaded_songs_button = ttk.Button(
-            self.buttons_frame,
-            text="Check if songs are downloaded",
-            command=self.check_downloaded_songs,
-        )
-        self.check_downloaded_songs_button.pack(side="left", padx=10)
+        self.fetch_songs_button.pack(side="left", padx=5)
 
         self.download_songs_button = ttk.Button(
             self.buttons_frame,
             text="Download Songs",
             command=self.download_songs,
         )
-        self.download_songs_button.pack(side="left", padx=10)
+        self.download_songs_button.pack(side="left", padx=5)
 
         self.cancel_button = ttk.Button(
-            self.buttons_frame, text="Cancel Operation", command=self.cancel_operation
+            self.buttons_frame, text="Cancel", command=self.cancel_operation
         )
-        self.cancel_button.pack(side="right", padx=10)
+        self.cancel_button.pack(side="right", padx=5)
 
         # Initial state
         self.is_operation_running = False
         self.cancelled = False
-
-    def go_to_main_menu(self):
-        """Go back to main menu"""
-        self.trigger_event("navigate_to", "main_menu")
 
     def update_progress(self, value, text=None):
         """
@@ -177,7 +149,6 @@ class UpdateDBView(BaseView):
         self.is_operation_running = True
         self.cancelled = False
         self.cancel_button["state"] = "normal"
-        self.back_button["state"] = "disabled"
 
         # Clear the log
         self.log_text.configure(state="normal")
@@ -191,29 +162,11 @@ class UpdateDBView(BaseView):
         self.add_log_message("Starting song download...")
         self.controller.download_songs()
 
-    def check_downloaded_songs(self):
-        """Check if songs are downloaded"""
-        self.is_operation_running = True
-        self.cancelled = False
-        self.cancel_button["state"] = "normal"
-        self.back_button["state"] = "disabled"
-
-        # Clear the log
-        self.log_text.configure(state="normal")
-        self.log_text.delete(1.0, tk.END)
-        self.log_text.configure(state="disabled")
-
-        # Reset the progress bar
-        self.update_progress(0)
-
-        self.controller.check_downloaded_songs()
-
     def fetch_songs_urls(self):
         """Fetch songs URLs from the database"""
         self.is_operation_running = True
         self.cancelled = False
         self.cancel_button["state"] = "normal"
-        self.back_button["state"] = "disabled"
 
         # Clear the log
         self.log_text.configure(state="normal")
@@ -230,7 +183,6 @@ class UpdateDBView(BaseView):
         self.is_operation_running = True
         self.cancelled = False
         self.cancel_button["state"] = "normal"
-        self.back_button["state"] = "disabled"
 
         # Clear the log
         self.log_text.configure(state="normal")
@@ -248,10 +200,9 @@ class UpdateDBView(BaseView):
         """Finish the operation"""
         self.is_operation_running = False
         self.cancel_button["state"] = "disabled"
-        self.back_button["state"] = "normal"
 
         if success:
-            self.update_progress(100, "Completed")
+            self.update_progress(100, "Done")
             self.add_log_message("Operation completed successfully.")
         else:
             if self.cancelled:
