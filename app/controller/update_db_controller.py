@@ -47,14 +47,24 @@ class UpdateDBController(BaseController):
                 continue
             else:
                 self.view.add_log_message(f"Adding songs to database...")
+            
+            # Collect song IDs that are currently in this playlist
+            song_ids_in_playlist = []
             for song in playlist_songs_list:
                 self.view.add_log_message(
                     f"{song.artist} - {song.name} (ID: {song.id})"
                 )
                 Songs.add_song(song)
+                song_ids_in_playlist.append(song.id)
+
+            # Mark these songs as active in this playlist
+            Songs.mark_songs_active_in_playlist(playlist.playlist_id)
+            
+            # Mark songs NOT in this list as inactive (for this playlist)
+            Songs.mark_songs_inactive_in_playlist(playlist.playlist_id, song_ids_in_playlist)
 
             self.view.add_log_message(
-                f"Songs from playlist {playlist.name} successfully added."
+                f"Songs from playlist {playlist.name} successfully updated."
             )
             update_porcentage += update_porcentage_step
             self.view.update_progress(update_porcentage)

@@ -20,14 +20,20 @@ class MainView:
 
         self.style = ttk.Style()
         self.style.configure("TFrame", background="#f0f0f0")
+        self.style.configure("Sidebar.TFrame", background="#2c3e50")
         self.style.configure(
             "Header.TLabel", font=("Helvetica", 16, "bold"), background="#f0f0f0"
         )
-        self.style.configure(
-            "Nav.TButton", font=("Helvetica", 11), padding=10
+        
+        # Tab styling
+        self.style.configure("Tab.TButton", font=("Helvetica", 10), padding=(15, 12))
+        self.style.map("Tab.TButton",
+            background=[("active", "#34495e"), ("pressed", "#34495e")],
+            foreground=[("active", "white"), ("pressed", "white")]
         )
-        self.style.configure(
-            "NavSelected.TButton", font=("Helvetica", 11, "bold"), padding=10
+        self.style.configure("TabActive.TButton", font=("Helvetica", 10, "bold"), padding=(15, 12), background="#3498db", foreground="white")
+        self.style.map("TabActive.TButton",
+            background=[("active", "#2980b9"), ("pressed", "#2980b9")]
         )
 
         self.main_container = ttk.Frame(self.root, style="TFrame")
@@ -44,43 +50,47 @@ class MainView:
         self.controller = controller
 
     def create_sidebar(self):
-        self.sidebar = ttk.Frame(self.main_container, style="TFrame", width=200)
+        self.sidebar = ttk.Frame(self.main_container, style="Sidebar.TFrame", width=220)
         self.sidebar.pack(side="left", fill="y", padx=0, pady=0)
         self.sidebar.pack_propagate(False)
 
+        # Logo section
+        logo_frame = ttk.Frame(self.sidebar, style="Sidebar.TFrame")
+        logo_frame.pack(fill="x", padx=0, pady=0)
+        
         self.logo_label = ttk.Label(
-            self.sidebar, 
-            text="🎵 Hits\nDownloader", 
-            font=("Helvetica", 16, "bold"),
-            background="#2c3e50",
+            logo_frame, 
+            text="Hits Downloader", 
+            font=("Helvetica", 12, "bold"),
+            background="#1a252f",
             foreground="white",
-            padding=20
+            padding=12
         )
-        self.logo_label.pack(fill="x", pady=(0, 10))
+        self.logo_label.pack(fill="x", pady=0)
 
-        self.nav_frame = ttk.Frame(self.sidebar, style="TFrame")
-        self.nav_frame.pack(fill="x", padx=5, pady=5)
+        # Navigation tabs section
+        self.nav_frame = ttk.Frame(self.sidebar, style="Sidebar.TFrame")
+        self.nav_frame.pack(fill="both", expand=True, padx=0, pady=10)
 
         self.nav_buttons = {}
         
         nav_items = [
-            ("main_menu", "🏠 Inicio"),
-            ("update_db_view", "⬇️ Descargar & Actualizar"),
-            ("database_view", "📊 Ver Base de Datos"),
-            ("manage_playlists_view", "📋 Gestionar Playlists"),
+            ("update_db_view", "Download & Fetch"),
+            ("database_view", "Check Database"),
+            ("manage_playlists_view", "Manage Playlists"),
         ]
         
         for view_id, text in nav_items:
             btn = ttk.Button(
                 self.nav_frame,
                 text=text,
-                style="Nav.TButton",
+                style="Tab.TButton",
                 command=lambda v=view_id: self.navigate_callback(v)
             )
-            btn.pack(fill="x", pady=3)
+            btn.pack(fill="x", padx=8, pady=5)
             self.nav_buttons[view_id] = btn
 
-        self.current_view = "main_menu"
+        self.current_view = "update_db_view"
         self.update_nav_buttons()
 
     def navigate_callback(self, view_name):
@@ -92,9 +102,9 @@ class MainView:
     def update_nav_buttons(self):
         for view_id, btn in self.nav_buttons.items():
             if view_id == self.current_view:
-                btn.config(style="NavSelected.TButton")
+                btn.config(style="TabActive.TButton")
             else:
-                btn.config(style="Nav.TButton")
+                btn.config(style="Tab.TButton")
 
     def create_header(self):
         self.header = ttk.Frame(self.main_container, style="TFrame")
@@ -153,9 +163,9 @@ class MainView:
     def update_title(self, view_name):
         titles = {
             "main_menu": "Menú Principal",
-            "update_db_view": "Descargar y Actualizar Base de Datos",
-            "database_view": "Ver Base de Datos",
-            "manage_playlists_view": "Gestión de Playlists",
+            "update_db_view": "Download & Fetch Songs",
+            "database_view": "Check Songs in Database",
+            "manage_playlists_view": "Manage Playlists",
         }
         self.title_label.config(text=titles.get(view_name, "Hits Downloader"))
 

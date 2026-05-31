@@ -18,7 +18,7 @@ class MainController:
         self.view.set_controller(self)
         
         self.init_frames()
-        self.navigate_to("main_menu")
+        self.navigate_to("update_db_view")
 
     def init_frames(self):
         """Initialize all frames/views of the application and add them to the view manager."""
