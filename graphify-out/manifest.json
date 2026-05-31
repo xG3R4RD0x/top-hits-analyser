@@ -1,0 +1,242 @@
+{
+  "D:\\dev\\top-hits-analyser\\db_migrate.py": {
+    "mtime": 1772478816.6083357,
+    "ast_hash": "e2d1f8bc8c8fb2f138f8e5e9edecbca9",
+    "semantic_hash": "e2d1f8bc8c8fb2f138f8e5e9edecbca9"
+  },
+  "D:\\dev\\top-hits-analyser\\db_utils.py": {
+    "mtime": 1743182966.7600842,
+    "ast_hash": "0e7f8068cb624cddba2170c16d2f8d42",
+    "semantic_hash": "0e7f8068cb624cddba2170c16d2f8d42"
+  },
+  "D:\\dev\\top-hits-analyser\\get_music.py": {
+    "mtime": 1745524388.593016,
+    "ast_hash": "e26780d37b0d4a59e5c47b65141d5776",
+    "semantic_hash": "e26780d37b0d4a59e5c47b65141d5776"
+  },
+  "D:\\dev\\top-hits-analyser\\hit-analyser.py": {
+    "mtime": 1743186281.4932134,
+    "ast_hash": "f10eeadc6a2fd0604ba05d35ba8cc9a7",
+    "semantic_hash": "f10eeadc6a2fd0604ba05d35ba8cc9a7"
+  },
+  "D:\\dev\\top-hits-analyser\\init_db.py": {
+    "mtime": 1772478816.6093328,
+    "ast_hash": "90933f80cfb4a6319d1a09573c12b3bc",
+    "semantic_hash": "90933f80cfb4a6319d1a09573c12b3bc"
+  },
+  "D:\\dev\\top-hits-analyser\\migrate_excel_to_db.py": {
+    "mtime": 1743182966.7640822,
+    "ast_hash": "79cc4453b9909c66e9db5e82ab7fc388",
+    "semantic_hash": "79cc4453b9909c66e9db5e82ab7fc388"
+  },
+  "D:\\dev\\top-hits-analyser\\playlist_list.json": {
+    "mtime": 1746989135.7348113,
+    "ast_hash": "4616ea4815d4fc042e56ffe117a47d8f",
+    "semantic_hash": "4616ea4815d4fc042e56ffe117a47d8f"
+  },
+  "D:\\dev\\top-hits-analyser\\run_app.py": {
+    "mtime": 1746989135.7368126,
+    "ast_hash": "5ff943cbe9b6864f10eb46ee49bc27f8",
+    "semantic_hash": "5ff943cbe9b6864f10eb46ee49bc27f8"
+  },
+  "D:\\dev\\top-hits-analyser\\search_songs.py": {
+    "mtime": 1743182966.7700982,
+    "ast_hash": "9b65e18d291a96d259fd019028fe2d95",
+    "semantic_hash": "9b65e18d291a96d259fd019028fe2d95"
+  },
+  "D:\\dev\\top-hits-analyser\\setup.ps1": {
+    "mtime": 1772479821.0436926,
+    "ast_hash": "70e8bbe5b66eb98b567c41fd21163ed1",
+    "semantic_hash": "70e8bbe5b66eb98b567c41fd21163ed1"
+  },
+  "D:\\dev\\top-hits-analyser\\setup_database.py": {
+    "mtime": 1746989135.739025,
+    "ast_hash": "97dc713dfb7b41681a5dc12e42fc3202",
+    "semantic_hash": "97dc713dfb7b41681a5dc12e42fc3202"
+  },
+  "D:\\dev\\top-hits-analyser\\.vscode\\settings.json": {
+    "mtime": 1746989135.695371,
+    "ast_hash": "5bc615e374a6d4f57e905285c114f60e",
+    "semantic_hash": "5bc615e374a6d4f57e905285c114f60e"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\__init__.py": {
+    "mtime": 1746989135.6973717,
+    "ast_hash": "636ca1a0d06df86fb5fc314b781c8cb5",
+    "semantic_hash": "636ca1a0d06df86fb5fc314b781c8cb5"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\api\\spotipy.py": {
+    "mtime": 1747693726.215807,
+    "ast_hash": "a1ad84ec2a28c9f9011f0439f9040954",
+    "semantic_hash": "a1ad84ec2a28c9f9011f0439f9040954"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\controller\\base_controller.py": {
+    "mtime": 1747321255.393697,
+    "ast_hash": "d8c92ef00409c6d943c5436e94691fb1",
+    "semantic_hash": "d8c92ef00409c6d943c5436e94691fb1"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\controller\\controller.py": {
+    "mtime": 1779139840.8574686,
+    "ast_hash": "4707b9f4fcd3a2991d1877b1cf04bbd9",
+    "semantic_hash": "4707b9f4fcd3a2991d1877b1cf04bbd9"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\controller\\database_controller.py": {
+    "mtime": 1746989135.7053714,
+    "ast_hash": "152aa8a67b9d4e2f74d9e8352ec2901c",
+    "semantic_hash": "152aa8a67b9d4e2f74d9e8352ec2901c"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\controller\\manage_playlists_controller.py": {
+    "mtime": 1747321255.3974714,
+    "ast_hash": "73e4ea13c08e97108eb0d697ec18d813",
+    "semantic_hash": "73e4ea13c08e97108eb0d697ec18d813"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\controller\\menu_controller.py": {
+    "mtime": 1747321255.3984234,
+    "ast_hash": "b2e66cee5a77954583dd301c57edcdfa",
+    "semantic_hash": "b2e66cee5a77954583dd301c57edcdfa"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\controller\\update_db_controller.py": {
+    "mtime": 1772478816.6043475,
+    "ast_hash": "194aedfdad47c54b64d43ea70406041d",
+    "semantic_hash": "194aedfdad47c54b64d43ea70406041d"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\controller\\__init__.py": {
+    "mtime": 1746989135.7013724,
+    "ast_hash": "6fcec28b1c052a9fcbdf786f68640b11",
+    "semantic_hash": "6fcec28b1c052a9fcbdf786f68640b11"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\model\\db_config.py": {
+    "mtime": 1746989135.7113695,
+    "ast_hash": "4e9508332dd89a33e984ad32b8dc4d4e",
+    "semantic_hash": "4e9508332dd89a33e984ad32b8dc4d4e"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\model\\downloader.py": {
+    "mtime": 1772478816.605345,
+    "ast_hash": "64e8f00c354717dca05ff1992a8a57c3",
+    "semantic_hash": "64e8f00c354717dca05ff1992a8a57c3"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\model\\playlist.py": {
+    "mtime": 1747321255.4024258,
+    "ast_hash": "52c14159efd567559d3a839289b2496e",
+    "semantic_hash": "52c14159efd567559d3a839289b2496e"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\model\\playlists.py": {
+    "mtime": 1747689646.2150774,
+    "ast_hash": "9af10e4bac11772f92946ab702550682",
+    "semantic_hash": "9af10e4bac11772f92946ab702550682"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\model\\song.py": {
+    "mtime": 1772478816.6063457,
+    "ast_hash": "2de72db90e0c6d6a1a8531aea1351067",
+    "semantic_hash": "2de72db90e0c6d6a1a8531aea1351067"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\model\\songs.py": {
+    "mtime": 1772478816.6063457,
+    "ast_hash": "3486b77b3e893dea3d2ae73dff8eade1",
+    "semantic_hash": "3486b77b3e893dea3d2ae73dff8eade1"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\model\\__init__.py": {
+    "mtime": 1746989135.7103705,
+    "ast_hash": "68a99fc406b6206baae8f04e0af4647a",
+    "semantic_hash": "68a99fc406b6206baae8f04e0af4647a"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\test\\downloader_test.py": {
+    "mtime": 1746989135.721811,
+    "ast_hash": "01493ff46e4c532955ef2719870dfbb5",
+    "semantic_hash": "01493ff46e4c532955ef2719870dfbb5"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\test\\playlists_test.py": {
+    "mtime": 1747690028.893456,
+    "ast_hash": "02d41908df669bedba1d08596f70bb37",
+    "semantic_hash": "02d41908df669bedba1d08596f70bb37"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\test\\songs_test.py": {
+    "mtime": 1747691740.8457358,
+    "ast_hash": "76b4b45c008f185120a350bcb6e9f740",
+    "semantic_hash": "76b4b45c008f185120a350bcb6e9f740"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\test\\spotipy_test.py": {
+    "mtime": 1747321255.4054236,
+    "ast_hash": "199026faeef3595e3873c77da4bf3097",
+    "semantic_hash": "199026faeef3595e3873c77da4bf3097"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\test\\__init__.py": {
+    "mtime": 1746989135.720811,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\view\\base_view.py": {
+    "mtime": 1747321255.4084227,
+    "ast_hash": "7fde5201b2ce659742c600539b52d676",
+    "semantic_hash": "7fde5201b2ce659742c600539b52d676"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\view\\database_view.py": {
+    "mtime": 1746989135.7278163,
+    "ast_hash": "a9f64f87d6ba3c5b615234a3edd0662b",
+    "semantic_hash": "a9f64f87d6ba3c5b615234a3edd0662b"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\view\\main_view.py": {
+    "mtime": 1779139840.858466,
+    "ast_hash": "46e98f96f8f2011c2733ac3e24cb44d4",
+    "semantic_hash": "46e98f96f8f2011c2733ac3e24cb44d4"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\view\\manage_playlists_view.py": {
+    "mtime": 1747321255.4124177,
+    "ast_hash": "9ddf324999bd657e9f1ec8ea06e0e417",
+    "semantic_hash": "9ddf324999bd657e9f1ec8ea06e0e417"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\view\\menu_view.py": {
+    "mtime": 1747321255.413447,
+    "ast_hash": "86693562fda17c5b115748fb56dcc2db",
+    "semantic_hash": "86693562fda17c5b115748fb56dcc2db"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\view\\update_db_view.py": {
+    "mtime": 1772478816.6073382,
+    "ast_hash": "d031f020e75c25faf9e28b83547da1e9",
+    "semantic_hash": "d031f020e75c25faf9e28b83547da1e9"
+  },
+  "D:\\dev\\top-hits-analyser\\app\\view\\__init__.py": {
+    "mtime": 1746989135.725809,
+    "ast_hash": "6ce83f1937b9e740254f8f4ed5c1605a",
+    "semantic_hash": "6ce83f1937b9e740254f8f4ed5c1605a"
+  },
+  "D:\\dev\\top-hits-analyser\\AGENTS.md": {
+    "mtime": 1779214342.131752,
+    "ast_hash": "a289df7ff07642036e7547a8e92c8208",
+    "semantic_hash": "a289df7ff07642036e7547a8e92c8208"
+  },
+  "D:\\dev\\top-hits-analyser\\README.md": {
+    "mtime": 1743182966.7590878,
+    "ast_hash": "5b53f36c806b60b1d7da6b053f4acec7",
+    "semantic_hash": "5b53f36c806b60b1d7da6b053f4acec7"
+  },
+  "D:\\dev\\top-hits-analyser\\requirements.txt": {
+    "mtime": 1745270772.5101655,
+    "ast_hash": "f8790b618358255da27fa58fd0c43086",
+    "semantic_hash": "f8790b618358255da27fa58fd0c43086"
+  },
+  "D:\\dev\\top-hits-analyser\\.github\\copilot-instructions.md": {
+    "mtime": 1745263802.4653504,
+    "ast_hash": "813b757596455b235253f5f11e06ed08",
+    "semantic_hash": "813b757596455b235253f5f11e06ed08"
+  },
+  "D:\\dev\\top-hits-analyser\\.github\\workflows\\add-qa-issues-to-global-board.yml": {
+    "mtime": 1779139843.9474866,
+    "ast_hash": "78001af80b083720cc4d4a43f37cdf09",
+    "semantic_hash": "78001af80b083720cc4d4a43f37cdf09"
+  },
+  "D:\\dev\\top-hits-analyser\\docs\\agents\\domain.md": {
+    "mtime": 1779214337.0293822,
+    "ast_hash": "477d9959972912279da5677825ef61c3",
+    "semantic_hash": "477d9959972912279da5677825ef61c3"
+  },
+  "D:\\dev\\top-hits-analyser\\docs\\agents\\issue-tracker.md": {
+    "mtime": 1779214332.954127,
+    "ast_hash": "b3268117bb0bb6b731632d35d6a1369a",
+    "semantic_hash": "b3268117bb0bb6b731632d35d6a1369a"
+  },
+  "D:\\dev\\top-hits-analyser\\docs\\agents\\triage-labels.md": {
+    "mtime": 1779214334.3339362,
+    "ast_hash": "8da632940521ccadaf0aaf0831425adc",
+    "semantic_hash": "8da632940521ccadaf0aaf0831425adc"
+  }
+}
