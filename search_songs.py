@@ -1,5 +1,6 @@
 from yt_dlp import YoutubeDL
 import re
+from app.model.downloader import get_cookie_options
 
 
 class YouTubeSearcher:
@@ -8,8 +9,9 @@ class YouTubeSearcher:
             "format": "best",
             "quiet": True,
             "noplaylist": True,
-            "extract_flat": True,  # Esto evita la descarga completa y solo extrae la información
-            "force_generic_extractor": True,  # Asegura que se utilice un extractor genérico para la búsqueda
+            "extract_flat": True,
+            "force_generic_extractor": True,
+            **get_cookie_options(),
         }
 
     def search_youtube(self, query):

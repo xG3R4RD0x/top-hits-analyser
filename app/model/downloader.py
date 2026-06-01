@@ -1,7 +1,27 @@
+from functools import lru_cache
+
 from yt_dlp import YoutubeDL
 import os
+import subprocess
 from app.model.song import Song
 from app.model.songs import Songs
+
+
+@lru_cache(maxsize=1)
+def get_cookie_options():
+    opts = {
+        "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
+    }
+    try:
+        result = subprocess.run(
+            ["tasklist", "/FI", "IMAGENAME eq msedge.exe", "/NH"],
+            capture_output=True, text=True, timeout=5
+        )
+        if "msedge.exe" not in result.stdout.lower():
+            opts["cookiesfrombrowser"] = ("edge",)
+    except Exception:
+        pass
+    return opts
 
 
 class Downloader:
@@ -21,6 +41,7 @@ class Downloader:
             "quiet": True,
             "noplaylist": True,
             "extract_flat": True,
+            **get_cookie_options(),
         }
         if not overwrite and song.youtube_url:
             return song.youtube_url
@@ -70,6 +91,7 @@ class Downloader:
                     "preferredquality": "192",
                 }
             ],
+            **get_cookie_options(),
         }
 
         try:

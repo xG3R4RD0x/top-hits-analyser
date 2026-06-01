@@ -3,6 +3,7 @@ from yt_dlp import YoutubeDL
 import ffmpeg
 import pandas as pd
 import glob
+from app.model.downloader import get_cookie_options
 
 
 class YouTubeAudioDownloader:
@@ -23,16 +24,17 @@ class YouTubeAudioDownloader:
                 )  # Obtén la URL directamente del diccionario
                 video_title = f"{track['artist']} - {track['name']}"
                 ydl_opts = {
-                    "format": "bestaudio/best",  # Descargar el mejor audio disponible
+                    "format": "bestaudio/best",
                     "outtmpl": os.path.join(output_path, f"{video_title}.%(ext)s"),
                     "noplaylist": True,
                     "postprocessors": [
-                        {  # Postprocesador para convertir a mp3
+                        {
                             "key": "FFmpegExtractAudio",
                             "preferredcodec": "mp3",
                             "preferredquality": "192",
                         }
                     ],
+                    **get_cookie_options(),
                 }
                 try:
                     with YoutubeDL(ydl_opts) as ydl_with_opts:
