@@ -8,9 +8,26 @@ class DatabaseView(BaseView):
     """Vista para mostrar y gestionar la base de datos con filtros"""
 
     def setup_ui(self):
-        # Frame superior para controles/filtros
+        # Top bar with refresh button
+        self.top_bar = ttk.Frame(self)
+        self.top_bar.pack(fill="x", padx=10, pady=(10, 0))
+
+        self.refresh_button = tk.Button(
+            self.top_bar,
+            text="🔄",
+            font=("Segoe UI Emoji", 14),
+            width=2,
+            bd=0,
+            bg="#f0f0f0",
+            activebackground="#e0e0e0",
+            cursor="hand2",
+            command=self.fetch_all_songs,
+        )
+        self.refresh_button.pack(side="left")
+
+        # Frame para controles/filtros
         self.controls_frame = ttk.Frame(self)
-        self.controls_frame.pack(fill="x", padx=10, pady=10)
+        self.controls_frame.pack(fill="x", padx=10, pady=(5, 10))
 
         # Search box
         search_label = ttk.Label(self.controls_frame, text="Search (Song/Artist):")

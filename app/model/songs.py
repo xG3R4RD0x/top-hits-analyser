@@ -72,7 +72,18 @@ class Songs:
             (song.name, song.artist, song.album),
         )
         if cursor.fetchone()[0] > 0:
-            # Song already exists, do not add it again
+            # Song already exists - mark as active and update playlist info
+            cursor.execute(
+                """
+                UPDATE songs
+                SET in_playlist = 1,
+                    playlist_name = ?,
+                    playlist_id = ?
+                WHERE name = ? AND artist = ? AND album = ?
+                """,
+                (song.playlist_name, song.playlist_id, song.name, song.artist, song.album),
+            )
+            DB_CONNECTION.commit()
             return
 
         # Add the song if it doesn't exist
