@@ -3,12 +3,14 @@ from app.view.main_view import MainView
 from app.view.menu_view import MainMenuView
 from app.view.database_view import DatabaseView
 from app.view.update_db_view import UpdateDBView
+from app.view.unified_view import UnifiedView
 from app.view.manage_playlists_view import ManagePlaylistsView
 
 # Import specific controllers
 from app.controller.menu_controller import MenuController
 from app.controller.database_controller import DatabaseController
 from app.controller.update_db_controller import UpdateDBController
+from app.controller.unified_controller import UnifiedController
 from app.controller.manage_playlists_controller import ManagePlaylistsController
 
 
@@ -38,6 +40,11 @@ class MainController:
         manage_playlists_controller = ManagePlaylistsController(self)
         manage_playlists_frame = self.view.add_frame(
             ManagePlaylistsView, "manage_playlists_view", manage_playlists_controller
+        )
+
+        unified_controller = UnifiedController(self)
+        unified_frame = self.view.add_frame(
+            UnifiedView, "unified_view", unified_controller
         )
 
     def navigate_to(self, view_name):

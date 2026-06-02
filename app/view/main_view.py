@@ -5,6 +5,7 @@ from tkinter import ttk
 from app.view.menu_view import MainMenuView
 from app.view.database_view import DatabaseView
 from app.view.update_db_view import UpdateDBView
+from app.view.unified_view import UnifiedView
 
 
 class MainView:
@@ -78,6 +79,7 @@ class MainView:
             ("update_db_view", "Download & Fetch"),
             ("database_view", "Check Database"),
             ("manage_playlists_view", "Manage Playlists"),
+            ("unified_view", "Manage Songs"),
         ]
         
         for view_id, text in nav_items:
@@ -166,6 +168,7 @@ class MainView:
             "update_db_view": "Download & Fetch Songs",
             "database_view": "Check Songs in Database",
             "manage_playlists_view": "Manage Playlists",
+            "unified_view": "Manage Songs",
         }
         self.title_label.config(text=titles.get(view_name, "Hits Downloader"))
 
