@@ -1,5 +1,5 @@
-ffmpeg==1.4
-pandas==2.2.3
-python-dotenv==1.1.0
-spotipy==2.24.0
-yt_dlp==2025.3.31
+ffmpeg
+pandas
+python-dotenv
+spotipy
+yt_dlp

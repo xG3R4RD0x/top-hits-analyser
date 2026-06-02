@@ -105,6 +105,8 @@ class PlaylistSection(ttk.Frame):
 class UpdateDBView(BaseView):
     """View with collapsible playlist sections, lazy song loading, and global select"""
 
+    _mousewheel_bound = False
+
     def setup_ui(self):
         self.main_frame = ttk.Frame(self)
         self.main_frame.pack(fill="both", expand=True, padx=10, pady=10)
@@ -142,9 +144,10 @@ class UpdateDBView(BaseView):
         self.canvas.create_window((0, 0), window=self.playlist_inner, anchor="nw")
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
-        # Mouse wheel scrolling
-        self.canvas.bind("<MouseWheel>", self._on_mousewheel)
-        self.playlist_inner.bind("<MouseWheel>", self._on_mousewheel)
+        # Mouse wheel scrolling - bind_all captures events over child widgets too
+        if not UpdateDBView._mousewheel_bound:
+            self.bind_all("<MouseWheel>", self._on_mousewheel, add="+")
+            UpdateDBView._mousewheel_bound = True
 
         self.canvas.pack(side="left", fill="both", expand=True, padx=(5, 0), pady=5)
         self.scrollbar.pack(side="right", fill="y", pady=5)
@@ -221,7 +224,12 @@ class UpdateDBView(BaseView):
         self.cancelled = False
 
     def _on_mousewheel(self, event):
-        self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+        w = self.winfo_containing(event.x_root, event.y_root)
+        while w:
+            if w == self.playlist_container:
+                self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+                return "break"
+            w = w.master
 
     def toggle_log(self):
         self.log_expanded = not self.log_expanded
